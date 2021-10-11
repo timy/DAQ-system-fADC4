@@ -12,8 +12,8 @@ n_batch = len(waveform_lines)
 #sample_rate = 4 # single-channel
 sample_rate = 1 # ABCD mode
 
-info = info[1:6]
-waveform_lines = waveform_lines[1:6]
+info = info[0:6]
+waveform_lines = waveform_lines[0:6]
 
 idx_card = info[:,0] # 0-3 for the ADC input channel, 4 for the TDC, 5 for the time stamp
 idx_channel = info[:,1]

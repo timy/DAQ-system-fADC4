@@ -24,12 +24,6 @@
     <ClInclude Include="BaseWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="CfgDlgAdc4.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="ChannelDetailsAdc4.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="ConfigData.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -37,9 +31,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="DaqSystem.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DataAdc4.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="DataInRingBuffer.h">
@@ -58,12 +49,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="DataSender.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DeviceAdc4.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DeviceAdc4Params.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="DeviceParams.h">
@@ -102,13 +87,28 @@
     <ClInclude Include="DevMonitor.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="DevMonitorDataAdc4Type.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="DevMonitorDataBaseType.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="StatusBox.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Device\ADC4\ChannelDetailsAdc4.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Device\ADC4\DeviceAdc4Params.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Device\ADC4\DataAdc4.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Device\ADC4\CfgDlgAdc4.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Device\ADC4\DeviceAdc4.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Device\ADC4\DevMonitorDataAdc4Type.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

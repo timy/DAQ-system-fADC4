@@ -1,14 +1,14 @@
 ﻿#include "StatusBox.h"
 
 struct {
-    StatusValue value;
+    DaqStatusValue value;
     COLORREF rgb;
-} listStatus[STATUS_SIZE] = {
-    {STATUS_READY, RGB(150, 200, 255)},         // blue
-    {STATUS_RUNNING, RGB(0, 255, 0)},           // green
-    {STATUS_ERROR, RGB(255, 0, 0)},             // red
-    {STATUS_NOTHING, RGB(255, 255, 255)},       // white
-    {STATUS_UNAVAILABLE, RGB(200, 200, 200)},   // grey
+} listStatus[DAQ_STATUS_SIZE] = {
+    {DAQ_STATUS_READY, RGB(150, 200, 255)},         // blue
+    {DAQ_STATUS_RUNNING, RGB(0, 255, 0)},           // green
+    {DAQ_STATUS_ERROR, RGB(255, 0, 0)},             // red
+    {DAQ_STATUS_NOTHING, RGB(255, 255, 255)},       // white
+    {DAQ_STATUS_UNAVAILABLE, RGB(200, 200, 200)},   // grey
 };
 
 void StatusBox::create(int x_, int y_, int w_, int h_) {
@@ -18,7 +18,7 @@ void StatusBox::create(int x_, int y_, int w_, int h_) {
     h = h_;
 }
 
-void StatusBox::setStatus(const wchar_t* str_, StatusValue status_) {
+void StatusBox::setStatus(const wchar_t* str_, DaqStatusValue status_) {
     status = status_;
     wcscpy_s(str, _countof(str), str_);
 }

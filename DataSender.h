@@ -60,16 +60,16 @@ public:
 		signal = sig;
 	}
 
-	int start() { // NOTE!!! remove this after the debug
-		while (signal->bRun) {
-			//cout << "DataSender::start is running. [bRun=" << signal->bRun << "]" << endl;
-			std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-		}
-		cout << "signal \"quit\" received @ DataSender." << endl;
-		return 0;
-	}
+	//int start() { // NOTE!!! remove this after the debug
+	//	while (signal->bRun) {
+	//		//cout << "DataSender::start is running. [bRun=" << signal->bRun << "]" << endl;
+	//		std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+	//	}
+	//	cout << "signal \"quit\" received @ DataSender." << endl;
+	//	return 0;
+	//}
 
-/* NOTE!!! uncomment this if the debug for thread is done!
+ //NOTE!!! uncomment this if the debug for thread is done!
 	int start() {
 		static int countDataSent = 0;
 		packet_adc_header_t header;
@@ -128,7 +128,6 @@ public:
 		delete[] buffer;
 		return 0;
 	}
-*/
 	
 private:
 	int connect_to_server() {

@@ -160,12 +160,14 @@ void DeviceAdc4::capture(bool* bRun) {
 
 		// loop over each packet within the group
 		for (int i = 0; i < group->packet_count; i++) {
-			crono_packet* packet = (crono_packet*)group->packets[i];	// L771
+			// crono_packet* packet = (crono_packet*)group->packets[i];	// L771
+			ndigo_packet* packet = (ndigo_packet*)group->packets[i];	// NOTE!!!! crono_ and ndigo_ should be the same...
 
 			int length;
 			if (!(packet->type & NDIGO_PACKET_TYPE_TIMESTAMP_ONLY)) {
 				fprintf(file_info, "%02x %02x %02x %6d %11u\n", packet->card, packet->channel,
 					packet->flags, packet->length, packet->timestamp);
+				// this->dataProcessor->writeHeader(packet); // NOTE!!! switch from file export to dataProcessor
 				length = packet->length;
 			}
 
@@ -176,6 +178,9 @@ void DeviceAdc4::capture(bool* bRun) {
 					fprintf(file_data, "%8d", *(data++));
 				}
 				fprintf(file_data, "\n");
+
+				// this->dataProcessor->writeData(packet); // NOTE!!! switch from file export to dataProcessor
+
 				st->countDataTotal += length;
 				st->countData[packet->card] += length;
 			}

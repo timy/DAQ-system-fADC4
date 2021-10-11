@@ -16,7 +16,7 @@ class MainWindow;
 DaqSystem::DaqSystem() : err(0) {
 
 	dataProc = new DataProcessorMemCopy;
-	dev = new DeviceAdc4;     // NOTE!!!! we choose ADC as the device
+	dev = new DeviceAdc4;     // NOTE!!!! we choose ADC4 as the device, should be altered for other possible devices
 	dp = new DataProducer;
 	ds = new DataSender;
 	dm = new DevMonitor;
@@ -60,10 +60,6 @@ void DaqSystem::start() {
 
 	std::thread thrDevMonitor(&DevMonitor::start, dm);
 	ThreadWrapper wrapThrDevMonitor(thrDevMonitor);
-
-	// NOTE!!!! we comment the following just to focus on the debug of the DAQ system
-	//std::thread thrDataSend(&DataSender::start, ds);
-	//ThreadWrapper wrapThrDataSend(thrDataSend);
 }
 
 void DaqSystem::stop() {

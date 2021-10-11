@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "BaseWindow.h"
 #include "Widget.h"
@@ -36,11 +36,11 @@ private:
     bool bApply;
     bool bChannelEnabled[nChannels];
 
-    // »ñµÃcmdÏûÏ¢µÄ¿Ø¼ş£¬ÆäidÓ³Éäµ½¶ÔÓ¦µÄ´¦Àíº¯Êı
+    // è·å¾—cmdæ¶ˆæ¯çš„æ§ä»¶ï¼Œå…¶idæ˜ å°„åˆ°å¯¹åº”çš„å¤„ç†å‡½æ•°
     void cmd_ckbCardEnabled(WID id, int evt, LPARAM lParam);
     void cmd_cbbADCMode(WID id, int evt, LPARAM lParam);
     void cmd_btnApply(WID id, int evt, LPARAM lParam);
-    // ×ÓÇøÓòÉÏµÄ¿Ø¼ş´¦Àíº¯Êı
+    // å­åŒºåŸŸä¸Šçš„æ§ä»¶å¤„ç†å‡½æ•°
     void cmd_rdbMasterChannel(WID id, int evt, LPARAM lParam);
     void cmd_edtPrecursor(WID id, int evt, LPARAM lParam);
     void cmd_edtLength(WID id, int evt, LPARAM lParam);

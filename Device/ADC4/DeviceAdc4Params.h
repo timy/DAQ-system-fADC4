@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../../CoboldPC_2011_R5-2c_fADC4_2020-09-17/Sources/Libs/Ndigo_interface.h"
 

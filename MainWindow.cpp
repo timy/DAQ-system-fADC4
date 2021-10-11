@@ -167,13 +167,13 @@ void MainWindow::initializeStatusBox() {
             btnDaqCfg[i]->x - 105,
             btnDaqCfg[i]->y - btnDaqCfg[i]->h / 2,
             70, 40);
-        //statusBoxDevices[i].setStatus(L"enabled", STATUS_READY);
+        //statusBoxDevices[i].setStatus(L"enabled", DAQ_STATUS_READY);
         //statusBoxDevices[i].repaint(m_hwnd);
     }
 
     statusBoxNetwork = new StatusBox;
     statusBoxNetwork->create(330, 170, 100, 40);
-    statusBoxNetwork->setStatus(L"disconnected", STATUS_UNAVAILABLE);
+    statusBoxNetwork->setStatus(L"disconnected", DAQ_STATUS_UNAVAILABLE);
 }
 
 void MainWindow::finalizeStatusBox() {
@@ -373,7 +373,7 @@ void MainWindow::cmd_btnDaqStart(WID id, int evt, LPARAM lParam) {
     if (!isRunning) {
         for (int i = 0; i < nCards; i++) {
             if ((*deviceParams)[i]->isCardEnabled) {
-                statusBoxDevices[i].setStatus(L"enabled", STATUS_READY);
+                statusBoxDevices[i].setStatus(L"enabled", DAQ_STATUS_READY);
                 statusBoxDevices[i].repaint(m_hwnd);
             }
         }
@@ -389,7 +389,7 @@ void MainWindow::cmd_btnDaqImport(WID id, int evt, LPARAM lParams) {
     }
 
     const wchar_t* str[2] = { L"disabled", L"enabled" };
-    const StatusValue status[2] = { STATUS_UNAVAILABLE, STATUS_READY };
+    const DaqStatusValue status[2] = { DAQ_STATUS_UNAVAILABLE, DAQ_STATUS_READY };
     for (int i = 0; i < nCards; i++) {
         int idx = (*deviceParams)[i]->isCardEnabled;
         statusBoxDevices[i].setStatus(str[idx], status[idx]);
@@ -415,7 +415,10 @@ void MainWindow::cmd_btnProcLocalChoose(WID id, int evt, LPARAM lParam) {
 void MainWindow::cmd_btnProcStart(WID id, int evt, LPARAM lParam) {}
 void MainWindow::cmd_edtProcIp(WID id, int evt, LPARAM lParam) {}
 void MainWindow::cmd_edtProcPort(WID id, int evt, LPARAM lParam) {}
-void MainWindow::cmd_btnProcConnect(WID id, int evt, LPARAM lParam) {}
+void MainWindow::cmd_btnProcConnect(WID id, int evt, LPARAM lParam) {
+    //std::thread thrDataSend(&DataSender::start, ds);
+    //ThreadWrapper wrapThrDataSend(thrDataSend);
+}
 
 void MainWindow::cmd_btnDaqCfg(WID id, int evt, LPARAM lParam) {
     int i = (int)(id - btnDaqCfg[0]->id); // card id
@@ -441,7 +444,7 @@ void MainWindow::cmd_btnDaqCfg(WID id, int evt, LPARAM lParam) {
         //        RGB(0, 255, 0), L"enabled", 70);
         
         const wchar_t* str[2] = { L"disabled", L"enabled" };
-        const StatusValue status[2] = { STATUS_UNAVAILABLE, STATUS_READY };
+        const DaqStatusValue status[2] = { DAQ_STATUS_UNAVAILABLE, DAQ_STATUS_READY };
         int idx = (*deviceParams)[i]->isCardEnabled;
         statusBoxDevices[i].setStatus(str[idx], status[idx]);
         statusBoxDevices[i].repaint(m_hwnd);
@@ -485,7 +488,7 @@ void funcUpdateByDevMonitor(MainWindow* wnd, DevMonitorDataBaseType* status) {
     for (int i = 0; i < wnd->nCards; i++) {
         if ((*wnd->deviceParams)[i]->isCardEnabled) {
             wsprintf(str, L"%ld /s", st->countData[i] - countDataOld[i]);
-            wnd->statusBoxDevices[i].setStatus(str, STATUS_RUNNING);
+            wnd->statusBoxDevices[i].setStatus(str, DAQ_STATUS_RUNNING);
             wnd->statusBoxDevices[i].repaint(wnd->m_hwnd);
         }
         countDataOld[i] = st->countData[i];
