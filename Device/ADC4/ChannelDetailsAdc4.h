@@ -4,20 +4,21 @@
 #include <vector>
 #include <string>
 #include <Windows.h>
-#include "Widget.h"
+#include "../../Widget.h"
 
 class CfgDlgAdc4;
 
 class ChannelDetailsAdc4 {
 public:
-    ChannelDetailsAdc4();
+    ChannelDetailsAdc4(bool bAnalog=true);
     virtual ~ChannelDetailsAdc4();
-    void Create(CfgDlgAdc4* wnd, int x);
+    void Create(CfgDlgAdc4* wnd, unsigned int x);
     void EnableAll(bool bEnable);
 
     std::map<std::string, BaseWidget<CfgDlgAdc4>*> w;
 
 private:
+    bool bAnalog;
     std::vector<BaseWidget<CfgDlgAdc4>*> ws; // widget of sequence
     typedef void (CfgDlgAdc4::* CmdFunc)(WID, int, LPARAM);
     std::vector<CmdFunc> wsCmdFunc; // command functions

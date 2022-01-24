@@ -1,12 +1,13 @@
 ﻿#pragma once
 
 class DataProcessor;
-class DeviceItemParams;
-class DevMonitorDataBaseType;
+class DeviceParamsBase;
+class DaqStatusBaseType;
 #include <iostream>
 class BaseDevice {
 public:
-	virtual void initialize(DeviceItemParams** params, int* err) = 0;
+	BaseDevice() : nDevices(0), bOpened(false), dataProcessor(nullptr), status(nullptr) {}
+	virtual void initialize(DeviceParamsBase* params, int* err) = 0;
 	virtual void finalize() = 0;
 	virtual bool isOpened() { return bOpened; }
 	virtual void startAcquisition() {}
@@ -18,13 +19,12 @@ public:
 	//virtual inline void setActiveDevice(int i) { iCurrentDev = i; }
 	virtual inline void setDataProcessor(DataProcessor* dp) { dataProcessor = dp; }
 	//virtual inline long getTotalCountPackets() { return countPacketsTotal; }
-	virtual int getDeviceCount() { return nDevices; }
+	virtual unsigned int getDeviceCount() { return nDevices; }
 
 	// data struct to be implemented as needed for status monitor
-	DevMonitorDataBaseType* status;
-private:
-	int nDevices;
+	DaqStatusBaseType* status;
+protected:
+	unsigned int nDevices;
 	bool bOpened;
-	//int iCurrentDev;
 	DataProcessor* dataProcessor;
 };

@@ -1,32 +1,28 @@
 ﻿#include "DaqSystem.h"
 
 #include "BaseDevice.h"
-#include "Device/ADC4/DeviceAdc4Params.h"
+#include "DeviceParamsBase.h"
+#include "Device/ADC4/DeviceParamsAdc4.h"
 #include "Device/ADC4/DeviceAdc4.h"
-#include "DeviceParams.h"
 
 #include "DataProcessorMemCopy.h"
 #include "DataProducer.h"
 #include "DataSender.h"
-#include "DevMonitor.h"
 #include "DaqSignal.h"
 #include "ThreadWrapper.h"
 
 class MainWindow;
+
 DaqSystem::DaqSystem() : err(0) {
 
 	dataProc = new DataProcessorMemCopy;
 	dev = new DeviceAdc4;     // NOTE!!!! we choose ADC4 as the device, should be altered for other possible devices
 	dp = new DataProducer;
 	ds = new DataSender;
-	dm = new DevMonitor;
 	sig = new DaqSignal;
 
 	// init acquisition card
 	dev->setDataProcessor(dataProc);
-	// dev->setActiveDevice(0); // NOTE!!!! we may have multiple cards run simultaneously
-	// dev.startAcquisition(); // this launches "ndigo_capture", which actually should be started when clicking the button
-	// on the other hand, "dev.capture" is not to capture, but invoke "ndigo_read" to collect already launched DAQ device
 	
 	// init producer
 	dp->setDevice(dev);
@@ -34,15 +30,10 @@ DaqSystem::DaqSystem() : err(0) {
 
 	// init consumer (store, send via net, and postprocess etc.)
 	ds->setSignal(sig);
-
-	// init device monitor
-	dm->setSignal(sig);
-	dm->setDataSource(dev->status);
 }
 
 DaqSystem::~DaqSystem() {
 	delete sig;
-	delete dm;
 	delete ds;
 	delete dp;
 	delete dev;
@@ -51,26 +42,23 @@ DaqSystem::~DaqSystem() {
 
 
 
-void DaqSystem::start() {
-	cout << "DaqSystem::start, wait..." << endl;
+void DaqSystem::startDataProducer() {
+	cout << "DaqSystem::startDataProducer, wait..." << endl;
 	sig->bRun = true;
 	
 	std::thread thrDataProd(&DataProducer::start, dp);
-	ThreadWrapper wrapThrDataProd(thrDataProd);
-
-	std::thread thrDevMonitor(&DevMonitor::start, dm);
-	ThreadWrapper wrapThrDevMonitor(thrDevMonitor);
+	ThreadWrapper wrapThrDataProd(thrDataProd);	
 }
 
-void DaqSystem::stop() {
-	cout << "DaqSystem::stop, wait..." << endl;
+void DaqSystem::stopDataProducer() {
+	cout << "DaqSystem::stopDataProducer, wait..." << endl;
 	sig->bRun = false;
 }
 
-void DaqSystem::toggleStart(DeviceItemParams** params) {
+void DaqSystem::toggleStartDataAcquisition(DeviceParamsBase* params) {
 	if (!sig->bRun) {		
 		if (sig->bConfig) {
-			// no need to check if the device is opened, since we have checked in "initialize"
+			// no need to check the device status, since we do it in "initialize"
 			//if (dev->isOpened())
 			//	dev->finalize();
 			dev->initialize(params, &err);
@@ -78,10 +66,10 @@ void DaqSystem::toggleStart(DeviceItemParams** params) {
 				return;
 			sig->bConfig = false;
 		}
-		start();
+		startDataProducer();
 	} 
 	else {
-		stop();
+		stopDataProducer();
 	}
 }
 
@@ -93,12 +81,36 @@ void DaqSystem::setConfigRequired() {
 	sig->bConfig = true;
 }
 
-int DaqSystem::getNumberOfDevices() {
+unsigned int DaqSystem::getNumberOfDevices() {
 	return dev->getDeviceCount();
 }
 
-void DaqSystem::setDevMonitor(MainWindow* wnd, 
-	void (*funcUpdate)(MainWindow*, DevMonitorDataBaseType*)) {
-	dm->setDataDisplay(wnd);
-	dm->setUpdateFunc(funcUpdate);
+DaqStatusBaseType* DaqSystem::getDeviceStatus() { 
+	return dev->status;
 }
+
+
+void DaqSystem::startDataSender(std::string ip, unsigned short port) {
+	cout << "DaqSystem::startDataSender, wait..." << endl;
+	sig->bConnect = true;
+
+	std::thread thrDataSend(&DataSender::start, ds, ip, port);
+	ThreadWrapper wrapThrDataSend(thrDataSend);
+}
+
+void DaqSystem::stopDataSender() {
+	cout << "DaqSystem::stopDataSender, wait..." << endl;
+	sig->bConnect = false;
+}
+
+void DaqSystem::toggleStartRemoteConnection(std::string ip, int port)
+{
+	if (!ds->connected()) {
+		startDataSender(ip, port);
+	}
+	else {
+		stopDataSender();
+	}
+}
+
+

@@ -1,14 +1,13 @@
 ﻿#pragma once
 
-#include "BaseWindow.h"
-#include "Widget.h"
+#include "../../BaseWindow.h"
+#include "../../Widget.h"
 #include "ChannelDetailsAdc4.h"
-
-class DeviceAdc4Params;
+#include "DeviceParamsAdc4.h"
 
 class CfgDlgAdc4 : public BaseWindow<CfgDlgAdc4> {
 public:
-    CfgDlgAdc4(DeviceAdc4Params* dev_) : card(dev_), bApply(false) {}
+    CfgDlgAdc4(CardParamsAdc4* dev_) : card(dev_), bApply(false) {}
 
     PCWSTR ClassName() const { return L"Modal Dialog Class"; }
     LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lPaBram);
@@ -25,14 +24,15 @@ protected:
     Widget<CfgDlgAdc4, btn_t> btnApply;
 
     friend ChannelDetailsAdc4;
-    static const int nChannels = 4;
-    ChannelDetailsAdc4 chd[nChannels];
+    // 4 channels for A, B, C, D and 1 channel for T
+    static const unsigned int nChannels = CardParamsAdc4::nChannels; 
+    ChannelDetailsAdc4 chd[nChannels] = { true, true, true, true, false };
 
     virtual void onCreate(WPARAM wParamm, LPARAM lParam);
     virtual void onCommand(WPARAM wParam, LPARAM lParam);
 
 private:
-    DeviceAdc4Params* card;
+    CardParamsAdc4* card;
     bool bApply;
     bool bChannelEnabled[nChannels];
 
@@ -57,8 +57,8 @@ private:
     }
     void UpdateCardEnabled();
     void UpdateChannelEnabled();
-    void RetrieveIntFromEdit(HWND hWnd, unsigned int& value);
-    void UpdateEditFromInt(HWND hWnd, unsigned int value);
+    template <typename T> void RetrieveIntFromEdit(HWND hWnd, T& value); // T for int or unsigned int
+    template <typename T> void UpdateEditFromInt(HWND hWnd, T value); // T for int or unsigned int
 };
 
-bool DisplayModalDialog(HWND hParent, DeviceAdc4Params* card);
+bool DisplayModalDialog(HWND hParent, CardParamsAdc4* card);

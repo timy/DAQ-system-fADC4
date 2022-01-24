@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{6b4101df-9684-440b-b068-c27675d6facd}</ProjectGuid>
-    <RootNamespace>fADCdemo4</RootNamespace>
+    <ProjectGuid>{ffcdc2b4-b930-4d6a-bebf-0bd592e4b0a6}</ProjectGuid>
+    <RootNamespace>fADCdemo5</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -78,8 +78,6 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
-    <IncludePath>E:\cobold\fADC-test-app\fADC-demo-4;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -116,7 +114,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_SIMULATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -153,15 +151,19 @@
     <ClInclude Include="DataProcessorSaveFile.h" />
     <ClInclude Include="DataProducer.h" />
     <ClInclude Include="DataSender.h" />
-    <ClInclude Include="DeviceParams.h" />
+    <ClInclude Include="DataVisualizer.h" />
+    <ClInclude Include="DataVisualizerData.h" />
+    <ClInclude Include="DataVisualizerWindow.h" />
+    <ClInclude Include="CardParamsBase.h" />
+    <ClInclude Include="DeviceParamsBase.h" />
     <ClInclude Include="Device\ADC4\CfgDlgAdc4.h" />
     <ClInclude Include="Device\ADC4\ChannelDetailsAdc4.h" />
     <ClInclude Include="Device\ADC4\DataAdc4.h" />
     <ClInclude Include="Device\ADC4\DeviceAdc4.h" />
-    <ClInclude Include="Device\ADC4\DeviceAdc4Params.h" />
-    <ClInclude Include="Device\ADC4\DevMonitorDataAdc4Type.h" />
-    <ClInclude Include="DevMonitor.h" />
-    <ClInclude Include="DevMonitorDataBaseType.h" />
+    <ClInclude Include="Device\ADC4\DeviceParamsAdc4.h" />
+    <ClInclude Include="Device\ADC4\DaqStatusAdc4Type.h" />
+    <ClInclude Include="DaqStatusBaseType.h" />
+    <ClInclude Include="EditValue.h" />
     <ClInclude Include="LogDisplay.h" />
     <ClInclude Include="LogLines.h" />
     <ClInclude Include="LogStream.h" />
@@ -171,15 +173,20 @@
     <ClInclude Include="SimpleConfig.h" />
     <ClInclude Include="StatusBox.h" />
     <ClInclude Include="ThreadWrapper.h" />
+    <ClInclude Include="Timer.h" />
     <ClInclude Include="typedef.h" />
     <ClInclude Include="Widget.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DaqSystem.cpp" />
+    <ClCompile Include="DataVisualizer.cpp" />
+    <ClCompile Include="DataVisualizerWindow.cpp" />
+    <ClCompile Include="DeviceParamsBase.cpp" />
     <ClCompile Include="Device\ADC4\CfgDlgAdc4.cpp" />
     <ClCompile Include="Device\ADC4\ChannelDetailsAdc4.cpp" />
     <ClCompile Include="Device\ADC4\DeviceAdc4.cpp" />
-    <ClCompile Include="Device\ADC4\DeviceAdc4Params.cpp" />
+    <ClCompile Include="Device\ADC4\DeviceParamsAdc4.cpp" />
+    <ClCompile Include="Device\ADC4\DevMonitorDataAdc4Type.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="StatusBox.cpp" />

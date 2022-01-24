@@ -3,7 +3,8 @@
 #include "DataProcessor.h"
 #include "Device/ADC4/DataAdc4.h"
 #include "DataInRingBuffer.h"
-#include "../../CoboldPC_2011_R5-2c_fADC4_2020-09-17/Sources/Libs/Ndigo_interface.h"
+// #include "../../CoboldPC_2011_R5-2c_fADC4_2020-09-17/Sources/Libs/Ndigo_interface.h"
+#include "Device/ADC4/Libs/Ndigo_common_interface.h"
 #include <fstream>
 #include <iostream>
 
@@ -16,13 +17,15 @@ using std::endl;
 
 class DataProcessorMemCopy : public DataProcessor {
 public:
-	DataProcessorMemCopy() : countPackets(0), DataProcessor() {
+	DataProcessorMemCopy() : 
+		countPackets(0),
+		DataProcessor() {
 		for (int i = 0; i < nElemOfRingBuffer; i++) {
 			try {
 				packetBuffer[i].data = new uint64_t[maxDataLength];
 			} catch (std::bad_alloc& e) {
-				cerr << "[ERROR] bad_alloc when allocating packetBuffer[" << i << "].data:" << endl;
-				cerr << e.what() << endl;
+				cout << "[ERROR] bad_alloc when allocating packetBuffer[" << i << "].data:" << endl;
+				cout << e.what() << endl;
 				return;
 			}
 		}
@@ -35,17 +38,19 @@ public:
 	int writeHeader(ndigo_packet* packet) {
 		// attempt to transfer all data, whose header will be inserted into ring buffer here.
 		copy_to_ring_buffer(packet);
+
 		return 0;
 	}
 
 	int writeData(ndigo_packet* packet) {
 		return 0;
 	}
+
 private:
 	DataAdc4 packetBuffer[nElemOfRingBuffer];
 	size_t countPackets;
 
-	inline void copy_to_ring_buffer(ndigo_packet* packet) {
+	inline int copy_to_ring_buffer(ndigo_packet* packet) {
 		DataAdc4* ptr = &packetBuffer[countPackets++ & (nElemOfRingBuffer - 1)];
 		ptr->type = packet->type;
 		ptr->card = packet->card;
@@ -58,12 +63,12 @@ private:
 
 		// cout << "curr packet: " << packet << ", moving to " << ptr << endl;
 		
-		bool result = true;
+		int result = 0;
 		if (!queuePacket.insert(ptr)) {
 			cout << "Warning: packet skipped due to the full ring buffer" << endl;
-			result = false;
+			result = -1;
 		}
 		
-		return;
+		return result;
 	}
 };

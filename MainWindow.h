@@ -2,18 +2,15 @@
 #include "BaseWindow.h"
 #include "Widget.h"
 
-
-
-
-class MainWindow;
 class LogSystem;
 class LogDisplay;
 class DaqSystem;
-// class DeviceItemParams;
-class DeviceParams;
+// class CardParamsBase;
+class DeviceParamsAdc4;
 //struct CardParamsADC4;
-class DevMonitorDataBaseType;
-void funcUpdateByDevMonitor(MainWindow* wnd, DevMonitorDataBaseType* data);
+class DaqStatusBaseType;
+class DataVisualizer;
+class Timer;
 
 class StatusBox;
 
@@ -53,7 +50,7 @@ public:
     BOOL Show(int nCmdShow = SW_SHOWNORMAL);
 
 
-    int nCards; // NOTE!!!
+    unsigned int nCards; // NOTE!!!
 
 
 protected:
@@ -82,7 +79,6 @@ protected:
 
 
 
-    void cmd_btnTest(WID id, int evt, LPARAM lParam);
     void cmd_btnLogClear(WID id, int evt, LPARAM lParam);
     void cmd_btnDaqStart(WID id, int evt, LPARAM lParam);
     void cmd_btnDaqImport(WID id, int evt, LPARAM lParams);
@@ -98,10 +94,10 @@ protected:
     void cmd_btnDaqPlot(WID id, int evt, LPARAM lParam);
 
 
-    Widget<MainWindow, btn_t> btnTest;
     Widget<MainWindow, btn_t> btnLogClear;
 
     Widget<MainWindow, btn_t> btnDaqStart;
+    Widget<MainWindow, btn_t> btnDaqPlot;
     Widget<MainWindow, btn_t> btnDaqImport;
     Widget<MainWindow, btn_t> btnDaqExport;
 
@@ -113,7 +109,6 @@ protected:
     Widget<MainWindow, btn_t> btnProcConnect;
 
     std::vector<Widget<MainWindow, btn_t>*> btnDaqCfg;
-    std::vector<Widget<MainWindow, btn_t>*> btnDaqPlot;
 
     StatusBox* statusBoxDevices;
     StatusBox* statusBoxNetwork;
@@ -122,19 +117,25 @@ protected:
 
 private:
 
-    void initializeDaqSystem();
+    void initializeDaqSystem(); // 原则上应为 virtual。未来，应在具体设备的继承类中重载
     void finalizeDaqSystem();
 
     void initializeStatusBox();
     void finalizeStatusBox();
 
-    friend void funcUpdateByDevMonitor(MainWindow* wnd, DevMonitorDataBaseType* data);
+    void initializeVisualizer();
+    void finalizeVisualizer();
+
+    void updateDaqStatusByTimer(DaqStatusBaseType* data);
 
     LogSystem* logSystem;
     LogDisplay* logDisplay;
     DaqSystem* daq;
 
-    DeviceParams* deviceParams;
+    // 原则上，对于不同的具体设备，应设计一个新类，从 MainWindow 中继承，传入具体的 DeviceParams 。可以考虑 pimpl 设计
+    DeviceParamsAdc4* deviceParams; // 未来，应声明为 DeviceParamsBase*，在 initializeDaqSystem 中赋 DevcieParamsAdc4 的实例
+    DataVisualizer* vis;
+    Timer* timer;
 };
 
 

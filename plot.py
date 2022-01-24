@@ -55,8 +55,8 @@ def plot_time_stamps(dir_result):
 for i in idx_card_0:
     plot_signals(i)
     
-for i in idx_card_1:
-    plot_signals(i)
+#for i in idx_card_1:
+#    plot_signals(i)
     
 #for i in [idx_card_1[0]]:
 #    plot_signals(i)

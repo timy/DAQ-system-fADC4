@@ -1,6 +1,6 @@
 ﻿#include <Windows.h>
 #include "CfgDlgAdc4.h"
-#include "DeviceAdc4Params.h"
+#include "../../EditValue.h"
 
 // 获得cmd消息的控件，其id映射到对应的处理函数
 void CfgDlgAdc4::cmd_ckbCardEnabled(WID id, int evt, LPARAM lParam) {
@@ -19,10 +19,10 @@ void CfgDlgAdc4::cmd_cbbADCMode(WID id, int evt, LPARAM lParam) {
 }
 void CfgDlgAdc4::cmd_btnApply(WID id, int evt, LPARAM lParam) {
 	// check if parameters are properly set
-	// 在使用该卡的情况下，未使用的通道不可作为主 trigger
-	if (card->isCardEnabled) {
-		if (card->idxMasterChannel > -1) {
-			if (!bChannelEnabled[card->idxMasterChannel]) {
+	// channel not in use cannot be set as the trigger
+	if (card->isEnabled) {
+		if (card->maskTriggerChannel > 0) {
+			if (!bChannelEnabled[card->triggerChannel()]) {
 				MessageBox(m_hwnd,
 					L"Illegal master channel: "
 					"the selected channel as the master trigger is not used.",
@@ -31,11 +31,8 @@ void CfgDlgAdc4::cmd_btnApply(WID id, int evt, LPARAM lParam) {
 			}
 		}
 	}
-	else {
-		// 在该卡禁用时，其各通道均不可作为 trigger，因此重置
-		// 但不必令用户手动设置，无需 return，直接 apply 即可
-		if (card->idxMasterChannel > -1)
-			card->idxMasterChannel = -1;
+	else { // if the card is disabled, simply reset all trigger mask bits
+		card->maskTriggerChannel = 0;
 	}
 	// if appropiate, apply
 	bApply = true;
@@ -45,52 +42,52 @@ void CfgDlgAdc4::cmd_btnApply(WID id, int evt, LPARAM lParam) {
 // 子区域上的控件处理函数
 void CfgDlgAdc4::cmd_rdbMasterChannel(WID id, int evt, LPARAM lParam) {
 	size_t i = indexOfChannelDetailsGroup("rdbMasterChannel", id);
-	card->idxMasterChannel = (int)i;
+	card->maskTriggerChannel = 1 << i;
 	return;
 }
 void CfgDlgAdc4::cmd_edtPrecursor(WID id, int evt, LPARAM lParam) {
 	size_t i = indexOfChannelDetailsGroup("edtPrecursor", id);
 	if (evt == EN_KILLFOCUS) {
-		RetrieveIntFromEdit((HWND)lParam, card->channel[i].precursor);
+		RetrieveIntFromEdit((HWND)lParam, card->channels[i].precursor);
 	}
 	return;
 }
 void CfgDlgAdc4::cmd_edtLength(WID id, int evt, LPARAM lParam) {
 	size_t i = indexOfChannelDetailsGroup("edtLength", id);
 	if (evt == EN_KILLFOCUS) {
-		RetrieveIntFromEdit((HWND)lParam, card->channel[i].length);
+		RetrieveIntFromEdit((HWND)lParam, card->channels[i].length);
 	}
 	return;
 }
 void CfgDlgAdc4::cmd_ckbRetrigger(WID id, int evt, LPARAM lParam) {
 	size_t i = indexOfChannelDetailsGroup("ckbRetrigger", id);
 	if (evt == BN_CLICKED)
-		card->channel[i].isRetrigger = (int)SendMessage((HWND)lParam, BM_GETCHECK, 0, 0);
+		card->channels[i].isRetrigger = (int)SendMessage((HWND)lParam, BM_GETCHECK, 0, 0);
 	return;
 }
 void CfgDlgAdc4::cmd_ckbEdgeMode(WID id, int evt, LPARAM lParam) {
 	size_t i = indexOfChannelDetailsGroup("ckbEdgeMode", id);
 	if (evt == BN_CLICKED)
-		card->channel[i].isEdgeMode = (int)SendMessage((HWND)lParam, BM_GETCHECK, 0, 0);
+		card->channels[i].isEdgeMode = (int)SendMessage((HWND)lParam, BM_GETCHECK, 0, 0);
 	return;
 }
 void CfgDlgAdc4::cmd_ckbRising(WID id, int evt, LPARAM lParam) {
 	size_t i = indexOfChannelDetailsGroup("ckbRising", id);
 	if (evt == BN_CLICKED)
-		card->channel[i].isRising = (int)SendMessage((HWND)lParam, BM_GETCHECK, 0, 0);
+		card->channels[i].isRising = (int)SendMessage((HWND)lParam, BM_GETCHECK, 0, 0);
 	return;
 }
 void CfgDlgAdc4::cmd_edtThreshold(WID id, int evt, LPARAM lParam) {
 	size_t i = indexOfChannelDetailsGroup("edtThreshold", id);
 	if (evt == EN_KILLFOCUS) {
-		RetrieveIntFromEdit((HWND)lParam, card->channel[i].threshold);
+		RetrieveIntFromEdit((HWND)lParam, card->channels[i].threshold);
 	}
 	return;
 }
 void CfgDlgAdc4::cmd_edtOffset(WID id, int evt, LPARAM lParam) {
 	size_t i = indexOfChannelDetailsGroup("edtOffset", id);
 	if (evt == EN_KILLFOCUS) {
-		RetrieveIntFromEdit((HWND)lParam, card->channel[i].offset);
+		RetrieveIntFromEdit((HWND)lParam, card->channels[i].offset);
 	}
 	return;
 }
@@ -145,8 +142,8 @@ void CfgDlgAdc4::onPaint(WPARAM wParam, LPARAM lParam) {
 	// option frame and title
 	Rectangle(hdc, 10, 60, 100, 420);
 	dx = 80; // 100
-	wchar_t lbCard[][2] = {L"A", L"B", L"C", L"D"};
-	for (int i = 0; i < 4; i++) {
+	wchar_t lbCard[][2] = {L"A", L"B", L"C", L"D", L"T"};
+	for (unsigned int i = 0; i < 5; i++) {
 		// frame
 		Rectangle(hdc, 110 + i*dx, 60, 180 + i * dx, 420);
 		// title
@@ -157,7 +154,7 @@ void CfgDlgAdc4::onPaint(WPARAM wParam, LPARAM lParam) {
 	dy = 40;
 	wchar_t lbOptions[][16] = { L"is_master", L"precursor", L"length", L"retrigger", L"edge mode", L"rising",
 								L"threshold", L"offset" };
-	for (int i = 0; i < sizeof(lbOptions)/sizeof(lbOptions[0]); i ++)
+	for (unsigned int i = 0; i < sizeof(lbOptions)/sizeof(lbOptions[0]); i ++)
 		TextOut(hdc, 20, 100 + i*dy, lbOptions[i], (int)wcslen(lbOptions[i]));	
 	// 
 
@@ -177,41 +174,44 @@ void CfgDlgAdc4::onCreate(WPARAM wParamm, LPARAM lParam) {
 	//	SendMessage(cbbADCMode.hwnd , CB_ADDSTRING, 0, (LPARAM)modesADC[i]);
 	//SendMessage(cbbADCMode.hwnd, CB_SETCURSEL, (WPARAM)0, (LPARAM)0); // WPARAM for the index of the selected item
 
-	for (int i = 0; i < sizeof(ADC_mode_list) / sizeof(ADC_mode_list[0]); i++)
+	for (unsigned int i = 0; i < sizeof(ADC_mode_list) / sizeof(ADC_mode_list[0]); i++)
 		SendMessage(cbbADCMode.hwnd, CB_ADDSTRING, 0, (LPARAM)ADC_mode_list[i].label);
 
 
 
 	// detailed options
 	// - radio button: channel enabled
-	for (int i = 0; i < nChannels; i++)
-		chd[i].Create(this, 145 + i * 80);
+	for (unsigned int i = 0; i < nChannels; i++) {
+		chd[i].Create(this, 145 + i * 80); // 80
+	}
+
+	//chd[0].w["rdbMasterChannel"]->Create(this, 190, 100, nullptr);
 
 	// Combobox 选项
 	SendMessage(cbbADCMode.hwnd, CB_SETCURSEL, (WPARAM)AdcModeIndex(card->mode), (LPARAM)0);
 
 	// 采集卡 使能状态 复选框
-	SendMessage(ckbCardEnabled.hwnd, BM_SETCHECK, card->isCardEnabled, 0);
+	SendMessage(ckbCardEnabled.hwnd, BM_SETCHECK, card->isEnabled, 0);
 	UpdateCardEnabled();
 
 
 	// radiobutton 主通道单选框
-	if (card->idxMasterChannel > -1)
-		SendMessage(chd[card->idxMasterChannel].w["rdbMasterChannel"]->hwnd, BM_SETCHECK, TRUE, 0);
+	if (card->maskTriggerChannel > 0)
+		SendMessage(chd[card->triggerChannel()].w["rdbMasterChannel"]->hwnd, BM_SETCHECK, TRUE, 0);
 
 	// edit 设置初始值
-	for (int i = 0; i < nChannels; i++) {
-		UpdateEditFromInt(chd[i].w["edtPrecursor"]->hwnd, card->channel[i].precursor);
-		UpdateEditFromInt(chd[i].w["edtLength"]->hwnd, card->channel[i].length);		
-		UpdateEditFromInt(chd[i].w["edtThreshold"]->hwnd, card->channel[i].threshold);
-		UpdateEditFromInt(chd[i].w["edtOffset"]->hwnd, card->channel[i].offset);
+	for (unsigned int i = 0; i < nChannels; i++) {
+		UpdateEditFromInt(chd[i].w["edtPrecursor"]->hwnd, card->channels[i].precursor);
+		UpdateEditFromInt(chd[i].w["edtLength"]->hwnd, card->channels[i].length);		
+		UpdateEditFromInt(chd[i].w["edtThreshold"]->hwnd, card->channels[i].threshold);
+		UpdateEditFromInt(chd[i].w["edtOffset"]->hwnd, card->channels[i].offset);
 	}
 
 	// checkbox 设置初始值
-	for (int i = 0; i < nChannels; i++) {
-		SendMessage(chd[i].w["ckbRetrigger"]->hwnd, BM_SETCHECK, card->channel[i].isRetrigger, 0);
-		SendMessage(chd[i].w["ckbEdgeMode"]->hwnd, BM_SETCHECK, card->channel[i].isEdgeMode, 0);
-		SendMessage(chd[i].w["ckbRising"]->hwnd, BM_SETCHECK, card->channel[i].isRising, 0);
+	for (unsigned int i = 0; i < nChannels; i++) {
+		SendMessage(chd[i].w["ckbRetrigger"]->hwnd, BM_SETCHECK, card->channels[i].isRetrigger, 0);
+		SendMessage(chd[i].w["ckbEdgeMode"]->hwnd, BM_SETCHECK, card->channels[i].isEdgeMode, 0);
+		SendMessage(chd[i].w["ckbRising"]->hwnd, BM_SETCHECK, card->channels[i].isRising, 0);
 	}
 }
 
@@ -243,7 +243,7 @@ void CfgDlgAdc4::UpdateCardEnabled() {
 			chd[i].EnableAll(iChecked);
 	else                   // card enabled
 		UpdateChannelEnabled();
-	card->isCardEnabled = iChecked;
+	card->isEnabled = iChecked;
 }
 
 void CfgDlgAdc4::UpdateChannelEnabled() {
@@ -280,13 +280,25 @@ void CfgDlgAdc4::UpdateChannelEnabled() {
 		bChannelEnabled[3] = true;
 		break;
 	}
+	bChannelEnabled[4] = true; // digital T channel always enabled
 	// update the UI
-	for (int i = 0; i < nChannels; i++) {
+	for (unsigned int i = 0; i < nChannels; i++) {
 		chd[i].EnableAll(bChannelEnabled[i]);
 	}
+	// NOTE!!!! for the digital T channel, set as invisible in the future
+	chd[4].w["edtLength"]->Enable(false);
+	chd[4].w["edtPrecursor"]->Enable(false);
+	chd[4].w["ckbRetrigger"]->Enable(false);
+	chd[4].w["edtThreshold"]->Enable(false);
 }
 
-void CfgDlgAdc4::RetrieveIntFromEdit(HWND hWnd, unsigned int& value) {
+template <typename T>
+void CfgDlgAdc4::RetrieveIntFromEdit(HWND hWnd, T& value) {
+
+	EditValue ev(hWnd, L"An integer input is required!");
+	ev.get(value);
+
+	/*
 	int len = (int)SendMessage(hWnd, WM_GETTEXTLENGTH, 0, 0);
 	if (len == 0) {
 		MessageBox(NULL, L"An integer input is required!", L"Input error", MB_OK);
@@ -297,10 +309,12 @@ void CfgDlgAdc4::RetrieveIntFromEdit(HWND hWnd, unsigned int& value) {
 	SendMessage(hWnd, WM_GETTEXT, (WPARAM)len + 1, (LPARAM)buffer);
 	value = _wtoi(buffer);
 	delete[] buffer;
+	*/
 	UpdateEditFromInt(hWnd, value);
 }
 
-void CfgDlgAdc4::UpdateEditFromInt(HWND hWnd, unsigned int value) {
+template <typename T>
+void CfgDlgAdc4::UpdateEditFromInt(HWND hWnd, T value) {
 	wchar_t strVal[16];
 	swprintf_s(strVal, L"%d", value);
 	SetWindowText(hWnd, strVal);
@@ -308,7 +322,7 @@ void CfgDlgAdc4::UpdateEditFromInt(HWND hWnd, unsigned int value) {
 
 
 #include <iostream>
-bool DisplayModalDialog(HWND hParent, DeviceAdc4Params* card) {
+bool DisplayModalDialog(HWND hParent, CardParamsAdc4* card) {
 
 	EnableWindow(hParent, FALSE);
 
@@ -316,7 +330,7 @@ bool DisplayModalDialog(HWND hParent, DeviceAdc4Params* card) {
 	wchar_t title[32];
 	wsprintf(title, L"ADC Card %d Configuration", card->id);
 	if (!dlg.Create(title, WS_CAPTION | WS_VISIBLE, 0,
-		CW_USEDEFAULT, CW_USEDEFAULT, 450, 470, hParent)) {
+		CW_USEDEFAULT, CW_USEDEFAULT, 550, 470, hParent)) {
 		std::cout << "[ERR] Fail to create card configuratoin panel." << std::endl;
 		return false;
 	}
