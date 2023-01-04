@@ -15,14 +15,14 @@ class DaqStatusAdc4Type;
 class DeviceAdc4 : public BaseDevice {
 public:
 	DeviceAdc4();
-	virtual ~DeviceAdc4();
-	void startAcquisition();
-	void stopAcquisition();
-	void capture(bool* bRun);
-	virtual void initialize(DeviceParamsBase* params, int* err);
-	virtual void finalize();
+	~DeviceAdc4();
+	void startAcquisition() override;
+	void stopAcquisition() override;
+	void capture(bool* bRun) override;
+	virtual void initialize(DeviceParamsBase* params, int* err) override;
+	virtual void finalize() override;
 	
-	virtual bool isOpened() { return bOpened; }
+	virtual bool isOpened() override { return bOpened; }
 
 	
 
