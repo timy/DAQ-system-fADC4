@@ -96,7 +96,7 @@ void MainWindow::initializeStatusBox() {
 
     statusBoxNetwork = new StatusBox;
     statusBoxNetwork->create(330, 170, 100, 40);
-    statusBoxNetwork->setStatus(L"disconnected", DAQ_STATUS_UNAVAILABLE);
+    statusBoxNetwork->setStatus(L"disconnected", DaqStatusType::UNAVAILABLE);
 
     timer = new Timer;
 }
@@ -306,7 +306,7 @@ void MainWindow::cmd_btnDaqStart(WID id, int evt, LPARAM lParam) {
         timer->stop();
         for (unsigned int i = 0; i < nCards; i++) {
             if (deviceParams->cards[i]->isEnabled) {
-                statusBoxDevices[i].setStatus(L"enabled", DAQ_STATUS_READY);
+                statusBoxDevices[i].setStatus(L"enabled", DaqStatusType::READY);
                 statusBoxDevices[i].repaint(m_hwnd);
             }
         }
@@ -322,7 +322,7 @@ void MainWindow::cmd_btnDaqImport(WID id, int evt, LPARAM lParams) {
     }
 
     const wchar_t* str[2] = { L"disabled", L"enabled" };
-    const DaqStatusValue status[2] = { DAQ_STATUS_UNAVAILABLE, DAQ_STATUS_READY };
+    const DaqStatusType status[2] = { DaqStatusType::UNAVAILABLE, DaqStatusType::READY };
     for (unsigned int i = 0; i < nCards; i++) {
         bool enabled = deviceParams->cards[i]->isEnabled;
         statusBoxDevices[i].setStatus(str[enabled], status[enabled]);
@@ -344,7 +344,7 @@ void MainWindow::cmd_btnDaqCfg(WID id, int evt, LPARAM lParam) {
         // once parameters are set, notify the Daq that configuration is required
         daq->setConfigRequired(); // NOTE!!!! 检查何时需要将 isRequired 设为 false
         const wchar_t* str[2] = { L"disabled", L"enabled" };
-        const DaqStatusValue status[2] = { DAQ_STATUS_UNAVAILABLE, DAQ_STATUS_READY };
+        const DaqStatusType status[2] = { DaqStatusType::UNAVAILABLE, DaqStatusType::READY };
         bool enabled = deviceParams->cards[i]->isEnabled;
         statusBoxDevices[i].setStatus(str[enabled], status[enabled]);
         statusBoxDevices[i].repaint(m_hwnd);
@@ -413,7 +413,7 @@ void MainWindow::updateDaqStatusByTimer(DaqStatusBaseType* data) {
     for (unsigned int i = 0; i < nCards; i++) {
         if (deviceParams->cards[i]->isEnabled) {
             wsprintf(str, L"%ld /s", st->countData[i] - countDataOld[i]);
-            statusBoxDevices[i].setStatus(str, DAQ_STATUS_RUNNING);
+            statusBoxDevices[i].setStatus(str, DaqStatusType::RUNNING);
             statusBoxDevices[i].repaint(m_hwnd);
         }
         countDataOld[i] = st->countData[i];
