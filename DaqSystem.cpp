@@ -14,30 +14,36 @@
 class MainWindow;
 
 DaqSystem::DaqSystem() : err(0) {
-
-	dataProc = new DataProcessorMemCopy;
-	dev = new DeviceAdc4;     // NOTE!!!! we choose ADC4 as the device, should be altered for other possible devices
-	dp = new DataProducer;
-	ds = new DataSender;
+	dataProc = new DataProcessorMemCopy;	// NOTE!!!! choose data processing
+	dev = new DeviceAdc4;					// NOTE!!!! choose device
 	sig = new DaqSignal;
 
-	// init acquisition card
 	dev->setDataProcessor(dataProc);
-	
-	// init producer
-	dp->setDevice(dev);
-	dp->setSignal(sig);
-
-	// init consumer (store, send via net, and postprocess etc.)
-	ds->setSignal(sig);
+	initializeProducerConsumerModel();
 }
 
 DaqSystem::~DaqSystem() {
+	finalizeProducerConsumerModel();
 	delete sig;
-	delete ds;
-	delete dp;
 	delete dev;
 	delete dataProc;
+}
+
+
+void DaqSystem::initializeProducerConsumerModel() {
+	// init producer
+	dp = new DataProducer;
+	dp->setDevice(dev);
+	dp->setSignal(sig);
+
+	// init consumer (store, send via network, and postprocess etc.)
+	ds = new DataSender;
+	ds->setSignal(sig);
+}
+
+void DaqSystem::finalizeProducerConsumerModel() {
+	delete ds;
+	delete dp;
 }
 
 

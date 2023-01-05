@@ -27,6 +27,9 @@ public:
 
 private:
 
+	void initializeProducerConsumerModel();
+	void finalizeProducerConsumerModel();
+
 	void startDataProducer();
 	void stopDataProducer();
 
