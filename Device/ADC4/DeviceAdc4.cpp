@@ -367,7 +367,7 @@ void DeviceAdc4::configTrigParams(DeviceParamsBase* params) {
 #ifndef _SIMULATE
 		ndigo_get_default_configuration(devices[i], &cfg);
 #endif
-		cfg.adc_mode = pc->mode; // NOTE!!!! should get the sequence the same for ndigo and my own mode
+		cfg.adc_mode = static_cast<int>(pc->mode); // NOTE!!!! should get the sequence the same for ndigo and my own mode
 		cfg.trigger_block[4].enabled = false; // NOTE!!!! including i=4, also consider future extension using the TDC as trigger
 
 		//cout << "[Card " << i << "]" << endl;
@@ -535,20 +535,20 @@ void DeviceAdc4::setupStatus(DeviceParamsBase* params) {
 		CardParamsAdc4* pc = static_cast<CardParamsAdc4*>(p->cards[i]);
 		if (pc->isEnabled) {
 			switch (pc->mode) {
-			case ADC_MODE_ABCD:
+			case ADC_MODE::ABCD:
 				for (unsigned int j = 0; j < 4; j ++)
 					st->idxChannels[i].push_back(j);
 				break;
-			case ADC_MODE_A:
+			case ADC_MODE::A:
 				st->idxChannels[i].push_back(0);
 				break;
-			case ADC_MODE_B:
+			case ADC_MODE::B:
 				st->idxChannels[i].push_back(1);
 				break;
-			case ADC_MODE_C:
+			case ADC_MODE::C:
 				st->idxChannels[i].push_back(2);
 				break;
-			case ADC_MODE_D:
+			case ADC_MODE::D:
 				st->idxChannels[i].push_back(3);
 				break;
 			}

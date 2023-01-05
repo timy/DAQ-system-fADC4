@@ -249,31 +249,31 @@ void CfgDlgAdc4::UpdateCardEnabled() {
 void CfgDlgAdc4::UpdateChannelEnabled() {
 	// update the flags
 	switch (card->mode) {
-	case ADC_MODE_ABCD:
+	case ADC_MODE::ABCD:
 		bChannelEnabled[0] = true;
 		bChannelEnabled[1] = true;
 		bChannelEnabled[2] = true;
 		bChannelEnabled[3] = true;
 		break;
-	case ADC_MODE_A:
+	case ADC_MODE::A:
 		bChannelEnabled[0] = true;
 		bChannelEnabled[1] = false;
 		bChannelEnabled[2] = false;
 		bChannelEnabled[3] = false;
 		break;
-	case ADC_MODE_B:
+	case ADC_MODE::B:
 		bChannelEnabled[0] = false;
 		bChannelEnabled[1] = true;
 		bChannelEnabled[2] = false;
 		bChannelEnabled[3] = false;
 		break;
-	case ADC_MODE_C:
+	case ADC_MODE::C:
 		bChannelEnabled[0] = false;
 		bChannelEnabled[1] = false;
 		bChannelEnabled[2] = true;
 		bChannelEnabled[3] = false;
 		break;
-	case ADC_MODE_D:
+	case ADC_MODE::D:
 		bChannelEnabled[0] = false;
 		bChannelEnabled[1] = false;
 		bChannelEnabled[2] = false;

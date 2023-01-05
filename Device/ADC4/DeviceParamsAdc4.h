@@ -37,23 +37,23 @@ struct ChannelParamsAdc4 {
     int offset;
 };
 
-enum ADC_MODE {
-    ADC_MODE_ABCD = NDIGO_ADC_MODE_ABCD,
-    ADC_MODE_A = NDIGO_ADC_MODE_A,
-    ADC_MODE_B = NDIGO_ADC_MODE_B,
-    ADC_MODE_C = NDIGO_ADC_MODE_C,
-    ADC_MODE_D = NDIGO_ADC_MODE_D,
+enum class ADC_MODE {
+    ABCD = NDIGO_ADC_MODE_ABCD,
+    A = NDIGO_ADC_MODE_A,
+    B = NDIGO_ADC_MODE_B,
+    C = NDIGO_ADC_MODE_C,
+    D = NDIGO_ADC_MODE_D,
 };
 
 const struct {
     ADC_MODE mode;
     const wchar_t* label;
 } ADC_mode_list[] = {
-    {ADC_MODE_ABCD, L"ABCD"},
-    {ADC_MODE_A,    L"A"},
-    {ADC_MODE_B,    L"B"},
-    {ADC_MODE_C,    L"C"},
-    {ADC_MODE_D,    L"D"}
+    {ADC_MODE::ABCD, L"ABCD"},
+    {ADC_MODE::A,    L"A"},
+    {ADC_MODE::B,    L"B"},
+    {ADC_MODE::C,    L"C"},
+    {ADC_MODE::D,    L"D"}
 };
 
 unsigned int AdcModeIndex(ADC_MODE mode);

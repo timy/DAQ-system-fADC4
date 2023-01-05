@@ -12,7 +12,7 @@ public:
     CFG_TYPE_VAR(std::string key, ADC_MODE& value) : CFG_TYPE_ABSTRACT(key), v(value) {}
 
     virtual void write(std::ostringstream& ss) final {
-        ss << k << " = " << v;
+        ss << k << " = " << static_cast<int>(v);
     }
     virtual void read(std::istringstream& ss) final {
         std::string strKey, strEqu, strVal;
@@ -43,7 +43,7 @@ unsigned int AdcModeIndex(ADC_MODE mode) {
 /// 
 CardParamsAdc4::CardParamsAdc4() :
     CardParamsBase(),
-    mode(ADC_MODE_A),
+    mode(ADC_MODE::A),
     maskTriggerChannel(0)
 {
 }
