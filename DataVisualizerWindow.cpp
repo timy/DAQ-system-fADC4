@@ -12,14 +12,6 @@
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "Dwrite.lib")
 
-namespace {
-	enum WIDGET_ID {
-		WG_EDT_TEST,
-		WG_BTN_TEST,
-		WG_STT_TEST,
-	};
-}
-
 template <class T> void SafeRelease(T** ppT) {
 	if (*ppT != NULL) {
 		(*ppT)->Release();
