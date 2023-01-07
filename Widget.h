@@ -32,7 +32,7 @@ public:
         wnd->bind(id, func);
     }
     virtual void Enable(bool bEnable) {
-        if (hwnd > 0)
+        if (hwnd != NULL)
             EnableWindow(hwnd, bEnable);
     }
     HWND hwnd;
