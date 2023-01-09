@@ -6,7 +6,7 @@ struct {
 } listStatus[static_cast<int>(DaqStatusType::SIZE)] = {
     {DaqStatusType::READY, RGB(150, 200, 255)},         // blue
     {DaqStatusType::RUNNING, RGB(0, 255, 0)},           // green
-    {DaqStatusType::ERR, RGB(255, 0, 0)},             // red
+    {DaqStatusType::ERR, RGB(255, 0, 0)},               // red
     {DaqStatusType::NOTHING, RGB(255, 255, 255)},       // white
     {DaqStatusType::UNAVAILABLE, RGB(200, 200, 200)},   // grey
 };

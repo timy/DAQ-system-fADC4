@@ -154,7 +154,7 @@ void MainWindow::onCreate(WPARAM wParamm, LPARAM lParam) {
     // 初始化 DAQ 硬件
     initializeDaqSystem();
 
-
+    // DAQ 子卡配置按钮
     for (unsigned int i = 0; i < nCards; i++) {
         unsigned int y = 100 + i * 50;
         btnDaqCfg.push_back(new Widget<MainWindow, btn_t>);
