@@ -1,6 +1,10 @@
 ﻿#pragma once
 
+#ifndef _SIMULATE
 #include "Libs/Ndigo_interface.h"
+#else
+#include "SimulateAdc4.h"
+#endif
 #include "../../DeviceParamsBase.h"
 
 //////////////////////////////////////////////////////////////////

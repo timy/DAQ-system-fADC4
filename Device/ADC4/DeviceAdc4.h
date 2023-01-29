@@ -3,8 +3,12 @@
 // #include "../../../../CoboldPC_2011_R5-2c_fADC4_2020-09-17/Sources/Libs/Ndigo_interface.h"
 // #include "../../../../CoboldPC_2011_R5-2c_fADC4_2020-09-17/Sources/Libs/crono_tools.h"
 
+#ifndef _SIMULATE
 #include "Libs/Ndigo_interface.h"
 #include "Libs/crono_tools.h"
+#else
+#include "SimulateAdc4.h"
+#endif // _SIMULATE
 #include "../../BaseDevice.h"
 #include <cstdio>
 

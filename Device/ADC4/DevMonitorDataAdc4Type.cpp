@@ -1,8 +1,11 @@
 ﻿#include "DaqStatusAdc4Type.h"
 #include <iostream>
 // #include "../../../../CoboldPC_2011_R5-2c_fADC4_2020-09-17/Sources/Libs/Ndigo_interface.h"
+#ifndef _SIMULATE
 #include "Libs/Ndigo_interface.h"
-
+#else
+#include "SimulateAdc4.h"
+#endif
 
 DaqStatusAdc4Type::DaqStatusAdc4Type(size_t nDevices_) : nDevices(nDevices_) {
 	// allocate memory for waveform samples

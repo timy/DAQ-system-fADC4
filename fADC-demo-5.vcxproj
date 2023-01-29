@@ -164,6 +164,7 @@
     <ClInclude Include="Device\ADC4\DeviceParamsAdc4.h" />
     <ClInclude Include="Device\ADC4\DaqStatusAdc4Type.h" />
     <ClInclude Include="DaqStatusBaseType.h" />
+    <ClInclude Include="Device\ADC4\SimulateAdc4.h" />
     <ClInclude Include="EditValue.h" />
     <ClInclude Include="LogDisplay.h" />
     <ClInclude Include="LogLines.h" />
@@ -172,6 +173,7 @@
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="RingBuffer.h" />
     <ClInclude Include="SimpleConfig.h" />
+    <ClInclude Include="SimulatedDataSource.h" />
     <ClInclude Include="StatusBox.h" />
     <ClInclude Include="ThreadWrapper.h" />
     <ClInclude Include="Timer.h" />
@@ -188,6 +190,7 @@
     <ClCompile Include="Device\ADC4\DeviceAdc4.cpp" />
     <ClCompile Include="Device\ADC4\DeviceParamsAdc4.cpp" />
     <ClCompile Include="Device\ADC4\DevMonitorDataAdc4Type.cpp" />
+    <ClCompile Include="Device\ADC4\SimulateAdc4.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="StatusBox.cpp" />

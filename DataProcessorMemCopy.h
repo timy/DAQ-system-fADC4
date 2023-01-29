@@ -4,7 +4,13 @@
 #include "Device/ADC4/DataAdc4.h"
 #include "DataInRingBuffer.h"
 // #include "../../CoboldPC_2011_R5-2c_fADC4_2020-09-17/Sources/Libs/Ndigo_interface.h"
+
+// TODO: 未来不应依赖具体设备类型 ndigo_packet
+#ifndef _SIMULATE
 #include "Device/ADC4/Libs/Ndigo_common_interface.h"
+#else
+#include "Device/ADC4/SimulateAdc4.h"
+#endif
 #include <fstream>
 #include <iostream>
 

@@ -126,6 +126,12 @@
     <ClInclude Include="DeviceParamsBase.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="SimulatedDataSource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Device\ADC4\SimulateAdc4.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DaqSystem.cpp">
@@ -165,6 +171,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="DeviceParamsBase.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Device\ADC4\SimulateAdc4.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

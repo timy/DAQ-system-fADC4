@@ -1,6 +1,6 @@
 ﻿#include "DeviceAdc4.h"
 // #include "../../../../CoboldPC_2011_R5-2c_fADC4_2020-09-17/Sources/Libs/crono_tools.h"
-#include "Libs/crono_tools.h"
+
 #include "DeviceParamsAdc4.h"
 #include "DaqStatusAdc4Type.h"
 #include "../../DataProcessor.h"
@@ -66,13 +66,11 @@ void DeviceAdc4::startAcquisition() {
 
 	////////////////////////////////////////  开始采集数据
 
-#ifndef _SIMULATE
 	err_code = crono_sync_start_capture(ndigo_sync);
 	if (err_code != CRONO_OK) {
 		printf("Error %i in crono_sync_start_capture\n(%s)", err_code, crono_sync_get_last_error_message(ndigo_sync));
 		return;
 	}
-#endif
 
 	errno_t err;
 	err = fopen_s(&file_info, "info.dat", "w"); // NOTE!!!! file operation will be reconstructed soon
@@ -83,9 +81,7 @@ void DeviceAdc4::startAcquisition() {
 
 void DeviceAdc4::stopAcquisition() {
 	// ndigo_stop_capture(devices[iCurrentDev]);
-#ifndef _SIMULATE
 	crono_sync_stop_capture(ndigo_sync);
-#endif
 
 	fclose(file_info);
 	fclose(file_data);
@@ -132,22 +128,15 @@ void DeviceAdc4::capture(bool* bRun) {
 	st->countPacketsTotal = 0;
 	st->countDataTotal = 0;
 
-#ifdef _SIMULATE
-	const unsigned int simGroupCount = 2;
-	crono_group simDataGroups[simGroupCount];
-#endif
-
 	while (*bRun) {
 		// 两种情况下，需要重新读取数据：
 		// 当前 group_count 为零，意味着首次采集；
 		// 当前 currGroup 超过 crout 中的数据组群数，意味着之前读取的数据已经处理完毕
 		if (crout.group_count < 1 || currGroup >= crout.group_count) {
 			currGroup = 0;
-#ifndef _SIMULATE
+
 			err_code = crono_sync_read(ndigo_sync, &crin, &crout);	// L745
-#else // NOTE!!! try to fill data for simulate purpose...
-			crout.groups = &simDataGroups[0];
-#endif
+
 			st->cyclesReadTotal++;
 			st->cyclesReadValid++;
 		}
@@ -217,11 +206,9 @@ void DeviceAdc4::capture(bool* bRun) {
 }
 
 void DeviceAdc4::inquireCardsNumber() {
-#ifndef _SIMULATE
+
 	nDevices = ndigo_count_devices(&err_code, &err_msg);
-#else
-	nDevices = 2; // simulated card; if necessary, try some other numbers
-#endif
+
 	if (nDevices == 0) {
 		cout << "Error: no fADC4 device found!" << endl;
 		return;
@@ -231,9 +218,7 @@ void DeviceAdc4::inquireCardsNumber() {
 
 void DeviceAdc4::getStaticInfo() {
 	for (unsigned int i = 0; i < nDevices; i++) {
-#ifndef _SIMULATE
 		ndigo_get_static_info(devices[i], &static_info[i]);
-#endif
 		// cout << "Static information of device " << i << " ------------------\n";
 		// show_device_static_info(&static_info[i]);
 		cout << endl;
@@ -245,9 +230,7 @@ void DeviceAdc4::configInitParams(DeviceParamsBase* params) {
 	for (unsigned int i = 0; i < nDevices; i++) {
 		CardParamsAdc4* pc = static_cast<CardParamsAdc4*>(p->cards[i]);
 		ndigo_init_parameters* pp = &init_params[i];
-#ifndef _SIMULATE
 		ndigo_get_default_init_parameters(pp);
-#endif
 
 		pp->card_index = i;
 		pp->board_id = i;
@@ -271,7 +254,6 @@ void DeviceAdc4::configInitParams(DeviceParamsBase* params) {
 		//show_default_init_params(&pp);
 	}
 
-#ifndef _SIMULATE
 	// 应当在设置所有板卡参数后，只调用一次 init_multiple
 	ndigo_init_multiple(init_params, nDevices, (crono_device**)devices, &err_code, &err_msg);
 	if (err_code != NDIGO_OK && err_code != NDIGO_WINDRIVER_NOT_FOUND) {
@@ -279,7 +261,6 @@ void DeviceAdc4::configInitParams(DeviceParamsBase* params) {
 		throw "[ERROR] DeviceAdc4::configInitParams - nidgo_init_multiple";
 		return;
 	}
-#endif
 }
 // NOTE!!!!! 原始版本的 cfigTrigParams，各模拟通道自身的 trigger 触发，不涉及数字 T 通道
 // 通过用户界面配置 CardParamsBase
@@ -364,9 +345,9 @@ void DeviceAdc4::configTrigParams(DeviceParamsBase* params) {
 	for (unsigned int i = 0; i < nDevices; i++) {
 		// 板卡设置
 		CardParamsAdc4* pc = static_cast<CardParamsAdc4*>(p->cards[i]);
-#ifndef _SIMULATE
+
 		ndigo_get_default_configuration(devices[i], &cfg);
-#endif
+
 		cfg.adc_mode = static_cast<int>(pc->mode); // NOTE!!!! should get the sequence the same for ndigo and my own mode
 		cfg.trigger_block[4].enabled = false; // NOTE!!!! including i=4, also consider future extension using the TDC as trigger
 
@@ -434,13 +415,11 @@ void DeviceAdc4::configTrigParams(DeviceParamsBase* params) {
 		cfg.trigger_block[4].gates = NDIGO_TRIGGER_GATE_NONE;
 		*/
 
-#ifndef _SIMULATE
 		if (ndigo_configure(devices[i], &cfg) != NDIGO_OK) {
 			cout << "Fatal configuration of device " << i << " error. Aborting..." << endl;
 			throw "[ERROR] DeviceAdc4::configTrigParam - ndigo_configure";
 			return;
 		}
-#endif
 	}
 
 
@@ -456,9 +435,7 @@ void DeviceAdc4::configCronoSync(DeviceParamsBase* params) {
 
 	for (unsigned int i = 0; i < nDevices; i++) {					// L1479
 		cro_devices[i].board_id = i;   // cro_devices[0] = 0. Master must be 1st card.
-#ifndef _SIMULATE
 		ndigo_set_board_id(devices[i], i);  // will be packet->card
-#endif
 	}
 	cout << "[DONE] ndigo_set_board_id" << endl;
 
@@ -468,12 +445,11 @@ void DeviceAdc4::configCronoSync(DeviceParamsBase* params) {
 		cro_devices[i].device = devices[i];
 	}
 
-#ifndef _SIMULATE
 	for (unsigned int i = 0; i < nDevices; i++) {			// L1517
 		ndigo_fast_info info;
 		int result = ndigo_get_fast_info(devices[i], &info); // 这里info包含温度信息
 	}
-#endif
+
 	cout << "[DONE] ndigo_get_fast_info" << endl;
 
 	//////////////////////////////////////// 初始化 crono_sync
@@ -483,13 +459,12 @@ void DeviceAdc4::configCronoSync(DeviceParamsBase* params) {
 	sync_init.device_count = (int)nDevices;					// L1714
 	sync_init.devices = cro_devices;
 
-#ifndef _SIMULATE
 	ndigo_sync = crono_sync_init(&sync_init, &err_code, &err_msg);
 	if (!ndigo_sync) {
 		throw "[ERROR] DeviceAdc4::configCronoSync - crono_sync_init";
 		return;
 	}
-#endif
+
 	cout << "[DONE] ndigo_sync_init" << endl;
 
 	//////////////////////////////////////// 配置 crono sync
@@ -508,22 +483,19 @@ void DeviceAdc4::configCronoSync(DeviceParamsBase* params) {
 	int dGroupRangeEnd = p->range_end;     // ns
 	sync_conf.group_range_start = __int32(dGroupRangeStart * 1000.);		// L1802
 	sync_conf.group_range_end = __int32(dGroupRangeEnd * 1000.);
-#ifndef _SIMULATE
+
 	int ndigo_status = crono_sync_configure(ndigo_sync, &sync_conf, &err_code, &err_msg);
 	if (err_code != CRONO_OK) {
 		throw "[ERROR] DeviceAdc4::configCronoSync - crono_sync_configure";
 		return;
 	}
-#endif
 
 	cout << "Configuration completed." << endl << endl;
 
-#ifndef _SIMULATE
 	// ndigo 获得参数信息
 	ndigo_param_info param_info[10];
 	for (unsigned int i = 0; i < nDevices; i++)
 		ndigo_get_param_info(devices[i], &param_info[i]);
-#endif
 }
 
 void DeviceAdc4::setupStatus(DeviceParamsBase* params) {
@@ -578,11 +550,9 @@ void DeviceAdc4::initialize(DeviceParamsBase* params, int* err) {
 
 void DeviceAdc4::finalize() {
 	// 从构造函数中移到此处
-#ifndef _SIMULATE
 	crono_sync_close(ndigo_sync);
-	for (int i = 0; i < nDevices; i++)
+	for (unsigned int i = 0; i < nDevices; i++)
 		ndigo_close(devices[i]);
-#endif
 	bOpened = false;
 }
 
@@ -591,9 +561,7 @@ void DeviceAdc4::finalize() {
 void DeviceAdc4::getParameters() {
 	ndigo_param_info param_info;
 	for (unsigned int i = 0; i < nDevices; i++) {
-#ifndef _SIMULATE
 		ndigo_get_param_info(devices[i], &param_info);
-#endif
 		cout << "Param information of device " << i << " ------------------\n";
 		show_device_param_info(&param_info);
 		cout << endl;
