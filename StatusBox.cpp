@@ -11,6 +11,19 @@ struct {
     {DaqStatusType::UNAVAILABLE, RGB(200, 200, 200)},   // grey
 };
 
+StatusBoxBackgroundBrush::StatusBoxBackgroundBrush() {
+    for (unsigned int i = 0; i < static_cast<int>(DaqStatusType::SIZE); i++)
+        hStatusBrush[i] = CreateSolidBrush(listStatus[i].rgb);
+}
+
+StatusBoxBackgroundBrush::~StatusBoxBackgroundBrush() {
+    for (unsigned int i = 0; i < static_cast<int>(DaqStatusType::SIZE); i++)
+        DeleteObject(hStatusBrush[i]);
+}
+
+// the unique group of brushes with different colors, shared by all status boxes
+StatusBoxBackgroundBrush StatusBox::hStatusBrush; 
+
 void StatusBox::create(int x_, int y_, int w_, int h_) {
     x = x_;
     y = y_;
@@ -26,12 +39,11 @@ void StatusBox::setStatus(const wchar_t* str_, DaqStatusType status_) {
 void StatusBox::paint(HDC hdc) {
     RECT rect;
     Rectangle(hdc, x, y, x + w, y + h);
-    HBRUSH hbrush = CreateSolidBrush(listStatus[static_cast<int>(status)].rgb);
     SetRect(&rect, x + 5, y + 5, x + w - 5, y + h - 5);
     Rectangle(hdc, rect.left - 1, rect.top - 1, rect.right + 1, rect.bottom + 1);
-    FillRect(hdc, &rect, hbrush);
+    FillRect(hdc, &rect, hStatusBrush[status]);
     TextOut(hdc, x + 7, y + 12, str, (int)wcslen(str));
-}
+ }
 
 void StatusBox::repaint(HWND hwnd) {
     RECT rect = { x, y, x + w, y + h };
