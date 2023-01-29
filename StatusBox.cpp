@@ -42,8 +42,11 @@ void StatusBox::paint(HDC hdc) {
     SetRect(&rect, x + 5, y + 5, x + w - 5, y + h - 5);
     Rectangle(hdc, rect.left - 1, rect.top - 1, rect.right + 1, rect.bottom + 1);
     FillRect(hdc, &rect, hStatusBrush[status]);
+    int oldBkMode = GetBkMode(hdc);
+    SetBkMode(hdc, TRANSPARENT);
     TextOut(hdc, x + 7, y + 12, str, (int)wcslen(str));
- }
+    SetBkMode(hdc, oldBkMode);
+}
 
 void StatusBox::repaint(HWND hwnd) {
     RECT rect = { x, y, x + w, y + h };
