@@ -1,7 +1,9 @@
 #include "SimulateAdc4.h"
+#include "SimulatedDataSourceAdc4.h"
 
 NDIGO_API int ndigo_count_devices(int* error_code, const char** error_message) {
-	return 2;
+	const int nDevices = 2;
+	return nDevices;
 }
 
 NDIGO_API int ndigo_get_static_info(ndigo_device* device, ndigo_static_info* info) {
@@ -38,10 +40,15 @@ NDIGO_API int ndigo_close(ndigo_device* device) {
 
 
 
-crono_sync sync;
+static crono_sync sync;
+SimulatedDataSource* sds;
 
 CRONO_API crono_sync* crono_sync_init(crono_sync_init_parameters* params, int* error_code, const char** error_message) {
-	return &sync; // should NOT be null otherwise the program will stop
+	return &sync;
+}
+
+CRONO_API int crono_sync_close(crono_sync* device) {
+	return 0;
 }
 
 CRONO_API int ndigo_init_multiple(void* init_params, int count, crono_device** ndigo, int* error_code, const char** error_message) {
@@ -55,18 +62,17 @@ CRONO_API int crono_sync_configure(crono_sync* sync, crono_sync_configuration* c
 }
 
 CRONO_API int crono_sync_start_capture(crono_sync* device) {
+	sds = new SimulatedDataSource;
 	return 0;
 }
 
 CRONO_API int crono_sync_stop_capture(crono_sync* device) {
+	delete sds;
 	return 0;
 }
 
 CRONO_API int crono_sync_read(crono_sync* device, crono_sync_read_in* in, crono_sync_read_out* out) {
-	return 0;
-}
-
-CRONO_API int crono_sync_close(crono_sync* device) {
+	sds->generate(out);
 	return 0;
 }
 

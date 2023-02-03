@@ -126,10 +126,10 @@
     <ClInclude Include="DeviceParamsBase.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="SimulatedDataSource.h">
+    <ClInclude Include="Device\ADC4\SimulateAdc4.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Device\ADC4\SimulateAdc4.h">
+    <ClInclude Include="Device\ADC4\SimulatedDataSourceAdc4.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

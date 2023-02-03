@@ -159,8 +159,10 @@ void DeviceAdc4::capture(bool* bRun) {
 
 		// loop over each packet within the group
 		for (int iPkt = 0; iPkt < group->packet_count; iPkt++) {
-			// crono_packet* packet = (crono_packet*)group->packets[i];	// L771
-			ndigo_packet* packet = (ndigo_packet*)group->packets[iPkt];	// NOTE!!!! crono_ and ndigo_ should be the same...
+			//crono_packet* packet = group->packets[iPkt];	// L771
+			ndigo_packet* packet = reinterpret_cast<ndigo_packet*>(group->packets[iPkt]);
+			// NOTE!!!! crono_ and ndigo_ should be the same...
+			// timestamp is signed in crono_packet, while unsigned in ndigo_packet, but it's fine
 
 			unsigned int length;
 			if (!(packet->type & NDIGO_PACKET_TYPE_TIMESTAMP_ONLY)) {
