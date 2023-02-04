@@ -1,3 +1,5 @@
+#ifdef _SIMULATE
+
 #include "SimulateAdc4.h"
 #include "SimulatedDataSourceAdc4.h"
 
@@ -79,3 +81,5 @@ CRONO_API int crono_sync_read(crono_sync* device, crono_sync_read_in* in, crono_
 CRONO_API const char* crono_sync_get_last_error_message(crono_sync* device) {
 	return "OK";
 }
+
+#endif
