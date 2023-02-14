@@ -15,6 +15,7 @@
 
 class DataProcessor;
 class DaqStatusAdc4Type;
+class DeviceParamsAdc4;
 
 class DeviceAdc4 : public BaseDevice {
 public:
@@ -35,10 +36,10 @@ private:
 	void inquireCardsNumber();
 
 	// called by initialize (CardParamsBase* params)
-	void configInitParams(DeviceParamsBase* params);
-	void configTrigParams(DeviceParamsBase* params);
-	void configCronoSync(DeviceParamsBase* params);
-	void setupStatus(DeviceParamsBase* params);
+	void configInitParams(DeviceParamsAdc4* params);
+	void configTrigParams(DeviceParamsAdc4* params);
+	void configCronoSync(DeviceParamsAdc4* params);
+	void setupStatus(DeviceParamsAdc4* params);
 
 	void getStaticInfo();
 	void getParameters();

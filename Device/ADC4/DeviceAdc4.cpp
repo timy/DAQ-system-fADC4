@@ -226,11 +226,10 @@ void DeviceAdc4::getStaticInfo() {
 		cout << endl;
 	}
 }
-void DeviceAdc4::configInitParams(DeviceParamsBase* params) {
+void DeviceAdc4::configInitParams(DeviceParamsAdc4* params) {
 
-	DeviceParamsAdc4* p = static_cast<DeviceParamsAdc4*>(params);
 	for (unsigned int i = 0; i < nDevices; i++) {
-		CardParamsAdc4* pc = static_cast<CardParamsAdc4*>(p->cards[i]);
+		CardParamsAdc4* pc = static_cast<CardParamsAdc4*>(params->cards[i]);
 		ndigo_init_parameters* pp = &init_params[i];
 		ndigo_get_default_init_parameters(pp);
 
@@ -241,11 +240,11 @@ void DeviceAdc4::configInitParams(DeviceParamsBase* params) {
 		pp->buffer_size[0] = 1 << 23; // the minimum size of the DMA buffer, fADC4/10 only uses buffer_size[0]
 		// pp.buffer_size[0] = 0; // if set to 0, the default size of 16 MB is used
 		// pp.is_slave = (p->id != 0);             // NOTE!!!!! config for CardParamsBase!!!
-		pp->is_slave = (i != p->trigger_card);
+		pp->is_slave = (i != params->trigger_card);
 		// params.drive_external_clock = (p->id == 0); // NOTE!!!!! config for CardParamsBase!!!
-		pp->drive_external_clock = (i == p->trigger_card);
+		pp->drive_external_clock = (i == params->trigger_card);
 		// params.use_external_clock = (p->id != 0);   // NOTE!!!!! config for CardParamsBase!!!
-		pp->use_external_clock = (i != p->trigger_card);
+		pp->use_external_clock = (i != params->trigger_card);
 		pp->multiboard_sync = 1;
 		pp->sync_period = 4; // NOTE!!!! require further test
 		// pp.sync_delay = 1;
@@ -327,7 +326,7 @@ void DeviceAdc4::configTrigParams(CardParamsBase** params) {
 }
 */
 
-void DeviceAdc4::configTrigParams(DeviceParamsBase* params) {
+void DeviceAdc4::configTrigParams(DeviceParamsAdc4* params) {
 
 	ndigo_configuration cfg;
 	const unsigned int trigger_entries[] = {
@@ -343,10 +342,9 @@ void DeviceAdc4::configTrigParams(DeviceParamsBase* params) {
 		NDIGO_TRIGGER_SOURCE_D0,
 	};
 
-	DeviceParamsAdc4* p = static_cast<DeviceParamsAdc4*>(params);
 	for (unsigned int i = 0; i < nDevices; i++) {
 		// 板卡设置
-		CardParamsAdc4* pc = static_cast<CardParamsAdc4*>(p->cards[i]);
+		CardParamsAdc4* pc = static_cast<CardParamsAdc4*>(params->cards[i]);
 
 		ndigo_get_default_configuration(devices[i], &cfg);
 
@@ -428,7 +426,7 @@ void DeviceAdc4::configTrigParams(DeviceParamsBase* params) {
 
 }
 
-void DeviceAdc4::configCronoSync(DeviceParamsBase* params) {
+void DeviceAdc4::configCronoSync(DeviceParamsAdc4* params) {
 
 	// setup 主要用于对多卡同步的 crono_tool 进行初始化
 	// 在 crono 同步配置之前，需先完成 ndigo device 配置
@@ -473,16 +471,15 @@ void DeviceAdc4::configCronoSync(DeviceParamsBase* params) {
 
 	crono_sync_configuration sync_conf;
 
-	DeviceParamsAdc4* p = static_cast<DeviceParamsAdc4*>(params);
 	// crono_sync_get_default_configuration(ndigo_sync, &sync_conf);
 	// trigger_card, trigger_channel 定义了主控 trigger，并以此为参考时间零点
-	sync_conf.trigger_card = (int)p->trigger_card; // i32TriggerChannel / 6;				// L1798
+	sync_conf.trigger_card = (int)params->trigger_card; // i32TriggerChannel / 6;				// L1798
 	// sync_conf.trigger_channel = 0; // i32TriggerChannel - sync_conf.trigger_card * 6;
-	sync_conf.trigger_channel = (int)p->trigger_channel; // NOTE!!!! only for test, see if timestamp channel works...
+	sync_conf.trigger_channel = (int)params->trigger_channel; // NOTE!!!! only for test, see if timestamp channel works...
 
 	// group_range_start 与 group_range_end 决定了以主控 trigger 为零点的激活采样范围
-	int dGroupRangeStart = p->range_start; // ns
-	int dGroupRangeEnd = p->range_end;     // ns
+	int dGroupRangeStart = params->range_start; // ns
+	int dGroupRangeEnd = params->range_end;     // ns
 	sync_conf.group_range_start = __int32(dGroupRangeStart * 1000.);		// L1802
 	sync_conf.group_range_end = __int32(dGroupRangeEnd * 1000.);
 
@@ -500,13 +497,12 @@ void DeviceAdc4::configCronoSync(DeviceParamsBase* params) {
 		ndigo_get_param_info(devices[i], &param_info[i]);
 }
 
-void DeviceAdc4::setupStatus(DeviceParamsBase* params) {
+void DeviceAdc4::setupStatus(DeviceParamsAdc4* params) {
 	DaqStatusAdc4Type* st = static_cast<DaqStatusAdc4Type*>(status);
-	DeviceParamsAdc4* p = static_cast<DeviceParamsAdc4*>(params);
 	for (unsigned int i = 0; i < nDevices; i++) {
 		if (st->idxChannels[i].size() > 0)
 			st->idxChannels[i].clear();
-		CardParamsAdc4* pc = static_cast<CardParamsAdc4*>(p->cards[i]);
+		CardParamsAdc4* pc = static_cast<CardParamsAdc4*>(params->cards[i]);
 		if (pc->isEnabled) {
 			switch (pc->mode) {
 			case ADC_MODE::ABCD:
@@ -535,10 +531,11 @@ void DeviceAdc4::initialize(DeviceParamsBase* params, int* err) {
 	if (bOpened)
 		finalize();
 	try {
-		configInitParams(params); // 初始化参数
-		configTrigParams(params); // 触发参数
-		configCronoSync(params); // crono 多卡同步配置
-		setupStatus(params);
+		DeviceParamsAdc4* p = static_cast<DeviceParamsAdc4*>(params);
+		configInitParams(p); // 初始化参数
+		configTrigParams(p); // 触发参数
+		configCronoSync(p); // crono 多卡同步配置
+		setupStatus(p);
 	}
 	catch (const char* msg) {		
 		cout << msg << endl;
