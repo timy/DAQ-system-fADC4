@@ -175,7 +175,7 @@ void MainWindow::onPaint(WPARAM wParam, LPARAM lParam) {
     HDC hdc;
     hdc = BeginPaint(m_hwnd, &pc);
 
-    // 主 panel
+    // panel 主类别
     Rectangle(hdc, 10, 30, 300, 600);
     Rectangle(hdc, 310, 30, 600, 600);
 
@@ -186,53 +186,30 @@ void MainWindow::onPaint(WPARAM wParam, LPARAM lParam) {
     Rectangle(hdc, 320, 70, 590, 220); // “发送远程服务器”
     Rectangle(hdc, 320, 230, 590, 390); // “保存本地文件”
 
-    // 主类别
+    // label 主类别
     setLabel(hdc, 20, 40, L"Acquistion Hardware");
     setLabel(hdc, 320, 40, L"Data Processing");
 
-    // 采集卡
+    // label 采集卡
     setLabel(hdc, 40, 80, L"Cards");
     setLabel(hdc, 170, 80, L"Status");
 
-    // 远程服务器
+    // label 远程服务器
     setLabel(hdc, 330, 80, L"Send to Remote Server");
     setLabel(hdc, 330, 110, L"IP Address");
     setLabel(hdc, 330, 140, L"Port");
 
-    // 本地数据保存
+    // label 本地数据保存
     setLabel(hdc, 330, 240, L"Save to Local Directory");
 
-    // 设置状态
-    //Rectangle(hdc, 330, 170, 420, 230);
-    //wchar_t lbStatus[] = L"Status";
-    //TextOut(hdc, 350, 175, lbStatus, (int)wcslen(lbStatus));
-
-    //hbrush = CreateSolidBrush(RGB(0, 255, 0));
-    //SetRect(&rect, 341, 196, 409, 219);
-    //Rectangle(hdc, rect.left-1, rect.top-1, rect.right+1, rect.bottom+1);
-    //FillRect(hdc, &rect, hbrush);
-
-    //showStatusBox(hdc, 330, 170, RGB(200, 200, 200), L"disconnected");
-
-    //// draw status of cards on the LHS of "Config" buttons of acquisition cards
-    //for (int i = 0; i < nCards; i++) {
-    //    if ((*deviceParams)[i]->isEnabled)
-    //        showStatusBox(hdc, 
-    //            btnDaqCfg[i]->x - 105, 
-    //            btnDaqCfg[i]->y - btnDaqCfg[i]->h / 2, 
-    //            RGB(0, 255, 0), L"enabled", 70);
-    //    else
-    //        showStatusBox(hdc, 
-    //            btnDaqCfg[i]->x - 105, 
-    //            btnDaqCfg[i]->y - btnDaqCfg[i]->h / 2,
-    //            RGB(200, 200, 200), L"disabled", 70);
-    //}
-
+    // statusBox 状态框
     for (unsigned int i = 0; i < nCards; i++)
         statusBoxDevices[i].paint(hdc);
     statusBoxNetwork->paint(hdc);
 
+    // 日志区
     logDisplay->onPaint(hdc);
+
     EndPaint(m_hwnd, &pc);
 }
 
