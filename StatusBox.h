@@ -24,7 +24,7 @@ private:
 
 class StatusBox {
 public:
-    StatusBox() : x(0), y(0), w(100), h(40), str(L""), status(DaqStatusType::NOTHING) {}
+    StatusBox() : x(0), y(0), w(100), h(20), str(L""), status(DaqStatusType::NOTHING) {}
     virtual ~StatusBox() {}
     void create(int x, int y, int w, int h);
     void setStatus(const wchar_t* str, DaqStatusType status);

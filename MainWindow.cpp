@@ -87,15 +87,15 @@ void MainWindow::initializeStatusBox() {
     statusBoxDevices = new StatusBox[nCards];
     for (unsigned int i = 0; i < nCards; i++) {
         statusBoxDevices[i].create(
-            btnDaqCfg[i]->x - 135,
+            btnDaqCfg[i]->x + 40,
             btnDaqCfg[i]->y - btnDaqCfg[i]->h / 2,
-            70, 40);
+            180, 20);
         //statusBoxDevices[i].setStatus(L"enabled", DAQ_STATUS_READY);
         //statusBoxDevices[i].repaint(m_hwnd);
     }
 
     statusBoxNetwork = new StatusBox;
-    statusBoxNetwork->create(330, 170, 100, 40);
+    statusBoxNetwork->create(btnProcConnect.x - 190, btnProcConnect.y - btnProcConnect.h / 2, 130, 20);
     statusBoxNetwork->setStatus(L"disconnected", DaqStatusType::UNAVAILABLE);
 
     timer = new Timer;
@@ -134,8 +134,8 @@ void MainWindow::onCreate(WPARAM wParamm, LPARAM lParam) {
     btnDaqImport.Create(this, 90, 510, &MainWindow::cmd_btnDaqImport, L"Import");
     btnDaqExport.Create(this, 220, 510, &MainWindow::cmd_btnDaqExport, L"Export");
 
-    ckbLocal.Create(this, 360, 280, &MainWindow::cmd_ckbLocal, L"Save", 60, 30);
-    btnProcLocalChoose.Create(this, 520, 285, &MainWindow::cmd_btnProcLocalChoose, L"Choose...");
+    btnProcLocalChoose.Create(this, 520, 280, &MainWindow::cmd_btnProcLocalChoose, L"Choose...");
+    ckbLocal.Create(this, 360, btnProcLocalChoose.y, &MainWindow::cmd_ckbLocal, L"Save", 60);
     btnProcStart.Create(this, 530, 570, &MainWindow::cmd_btnProcStart, L"Start/Stop");
     btnLogClear.Create(this, 530, 520, &MainWindow::cmd_btnLogClear, L"Clear");
     // 远程数据传输 - 编辑框 - IP地址
@@ -156,9 +156,11 @@ void MainWindow::onCreate(WPARAM wParamm, LPARAM lParam) {
 
     // DAQ 子卡配置按钮
     for (unsigned int i = 0; i < nCards; i++) {
-        unsigned int y = 100 + i * 50;
+        wchar_t label[64];
+        wsprintf(label, L"Card %u", i);
+        unsigned int y = 120 + i * 30;
         btnDaqCfg.push_back(new Widget<MainWindow, btn_t>);
-        btnDaqCfg.back()->Create(this, 220, y, &MainWindow::cmd_btnDaqCfg, L"Config");
+        btnDaqCfg.back()->Create(this, 60, y, &MainWindow::cmd_btnDaqCfg, label, 60);
     }
 
     initializeStatusBox();
@@ -188,14 +190,11 @@ void MainWindow::onPaint(WPARAM wParam, LPARAM lParam) {
     wchar_t lbStat[] = L"System Log";
     TextOut(hdc, 620, 40, lbStat, (int)wcslen(lbStat));
 
-    // Card i
-    for (unsigned int i = 0; i < nCards; i++) {
-        unsigned int x = 30;
-        unsigned int y = 90 + i * 50;
-        wchar_t text[64];
-        wsprintf(text, L"Card %u", i);
-        TextOut(hdc, x, y, text, (int)wcslen(text));
-    }
+    // 采集卡
+    wchar_t lbCardsConfig[] = L"Cards";
+    TextOut(hdc, 40, 80, lbCardsConfig, (int)wcslen(lbCardsConfig));
+    wchar_t lbCardsStatus[] = L"Status";
+    TextOut(hdc, 170, 80, lbCardsStatus, (int)wcslen(lbCardsStatus));
 
     // 远程服务器
     wchar_t lbProcRemoteTitle[] = L"Send to Remote Server";

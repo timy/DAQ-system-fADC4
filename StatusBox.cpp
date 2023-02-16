@@ -39,12 +39,12 @@ void StatusBox::setStatus(const wchar_t* str_, DaqStatusType status_) {
 void StatusBox::paint(HDC hdc) {
     RECT rect;
     Rectangle(hdc, x, y, x + w, y + h);
-    SetRect(&rect, x + 5, y + 5, x + w - 5, y + h - 5);
-    Rectangle(hdc, rect.left - 1, rect.top - 1, rect.right + 1, rect.bottom + 1);
+    SetRect(&rect, x + 1, y + 1, x + w - 1, y + h - 1);
+    //Rectangle(hdc, rect.left - 1, rect.top - 1, rect.right + 1, rect.bottom + 1);
     FillRect(hdc, &rect, hStatusBrush[status]);
     int oldBkMode = GetBkMode(hdc);
     SetBkMode(hdc, TRANSPARENT);
-    TextOut(hdc, x + 7, y + 12, str, (int)wcslen(str));
+    TextOut(hdc, x + 1, y + 1, str, (int)wcslen(str));
     SetBkMode(hdc, oldBkMode);
 }
 

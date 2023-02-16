@@ -47,7 +47,7 @@ public:
     virtual void Create(WindowType* wnd, unsigned int x, unsigned int y, 
         typename BaseWidget<WindowType>::CmdFunc func,
         LPCWSTR text = L"", unsigned int w = 120, unsigned int h = 40) {
-        BaseWidget<WindowType>::Create(wnd, x, y, nullptr);
+        BaseWidget<WindowType>::Create(wnd, x, y, nullptr, text, w, h);
     }
 };
 
@@ -65,12 +65,12 @@ class Widget<WindowType, btn_t> : public BaseWidget<WindowType> { // Button
 public:
     virtual void Create(WindowType* wnd, unsigned int x, unsigned int y, 
         typename BaseWidget<WindowType>::CmdFunc func,
-        LPCWSTR text = L"", unsigned int w = 100, unsigned int h = 40) {        
+        LPCWSTR text = L"", unsigned int w = 100, unsigned int h = 20) {        
         this->hwnd = CreateWindow(L"button", text, 
             WS_VISIBLE | WS_CHILD,
             x - w / 2, y - h / 2, w, h, wnd->getHwnd(), (HMENU)this->id, 
             GetModuleHandle(NULL), NULL);
-        BaseWidget<WindowType>::Create(wnd, x, y, func);
+        BaseWidget<WindowType>::Create(wnd, x, y, func, text, w, h);
     }
 };
 
@@ -79,12 +79,12 @@ class Widget<WindowType, stt_t> : public BaseWidget<WindowType> { // Static
 public:
     virtual void Create(WindowType* wnd, unsigned int x, unsigned int y, 
         typename BaseWidget<WindowType>::CmdFunc func,
-        LPCWSTR text = L"", unsigned int w = 120, unsigned int h = 40) {
+        LPCWSTR text = L"", unsigned int w = 120, unsigned int h = 20) {
         this->hwnd = CreateWindow(L"static", text, 
             WS_VISIBLE | WS_CHILD,
             x - w / 2, y - h / 2, w, h, wnd->getHwnd(), (HMENU)this->id, 
             GetModuleHandle(NULL), NULL);
-        BaseWidget<WindowType>::Create(wnd, x, y, func);
+        BaseWidget<WindowType>::Create(wnd, x, y, func, text, w, h);
     }
 };
 
@@ -98,7 +98,7 @@ public:
             WS_VISIBLE | WS_CHILD | BS_AUTORADIOBUTTON,
             x - w / 2, y - h / 2, w, h, wnd->getHwnd(), (HMENU)this->id, 
             GetModuleHandle(NULL), NULL);
-        BaseWidget<WindowType>::Create(wnd, x, y, func);
+        BaseWidget<WindowType>::Create(wnd, x, y, func, text, w, h);
     }
 };
 
@@ -112,7 +112,7 @@ public:
             WS_VISIBLE | WS_CHILD | WS_BORDER, // | ES_NUMBER,
             x - w / 2, y - h / 2, w, h, wnd->getHwnd(), (HMENU)this->id, 
             GetModuleHandle(NULL), NULL);
-        BaseWidget<WindowType>::Create(wnd, x, y, func);
+        BaseWidget<WindowType>::Create(wnd, x, y, func, text, w, h);
     }
 };
 
@@ -126,7 +126,7 @@ public:
             WS_VISIBLE | WS_CHILD | WS_BORDER | ES_NUMBER,
             x - w / 2, y - h / 2, w, h, wnd->getHwnd(), (HMENU)this->id, 
             GetModuleHandle(NULL), NULL);
-        BaseWidget<WindowType>::Create(wnd, x, y, func);
+        BaseWidget<WindowType>::Create(wnd, x, y, func, text, w, h);
     }
 };
 
@@ -135,17 +135,17 @@ class Widget<WindowType, ckb_t> : public BaseWidget<WindowType> { // Checkbox
 public:
     virtual void Create(WindowType* wnd, unsigned int x, unsigned int y, 
         typename BaseWidget<WindowType>::CmdFunc func,
-        LPCWSTR text = L"", unsigned int w = 12, unsigned int h = 12) {
+        LPCWSTR text = L"", unsigned int w = 12, unsigned int h = 20) {
         this->hwnd = CreateWindow(L"button", text, 
             WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX,
             x - w / 2, y - h / 2, w, h, wnd->getHwnd(), (HMENU)this->id, 
             GetModuleHandle(NULL), NULL);
-        BaseWidget<WindowType>::Create(wnd, x, y, func);
+        BaseWidget<WindowType>::Create(wnd, x, y, func, text, w, h);
     }
 };
 
 template <typename WindowType>
-class Widget<WindowType, cbb_t> : public BaseWidget<WindowType> { // Checkbox
+class Widget<WindowType, cbb_t> : public BaseWidget<WindowType> { // Combo box
 public:
     virtual void Create(WindowType* wnd, unsigned int x, unsigned int y, 
         typename BaseWidget<WindowType>::CmdFunc func,
@@ -154,7 +154,7 @@ public:
             WS_VISIBLE | WS_CHILD | CBS_DROPDOWNLIST | CBS_HASSTRINGS,
             x - w / 2, y, w, h, wnd->getHwnd(), (HMENU)this->id, 
             GetModuleHandle(NULL), NULL);
-        BaseWidget<WindowType>::Create(wnd, x, y, func);
+        BaseWidget<WindowType>::Create(wnd, x, y, func, text, w, h);
     }
 };
 
@@ -165,6 +165,6 @@ public:
         typename BaseWidget<WindowType>::CmdFunc func=nullptr,
         LPCWSTR text = L"", unsigned int w = 0, unsigned int h = 0) {
         this->hwnd = 0;
-        BaseWidget<WindowType>::Create(wnd, x, y, func);
+        BaseWidget<WindowType>::Create(wnd, x, y, func, text, w, h);
     }
 };
