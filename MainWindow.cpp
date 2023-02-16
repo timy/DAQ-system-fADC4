@@ -22,6 +22,9 @@
 
 bool chooseFilePath(wchar_t* pathName, unsigned int size);
 bool chooseDirectory(wchar_t* pathName);
+inline void setLabel(HDC hdc, int x, int y, const wchar_t text[]) {
+    TextOut(hdc, x, y, text, (int)wcslen(text));
+}
 
 // MainWindow 原则上通用于任何采集卡，无需知道特定采集卡（如 ADC4）的具体细节。
 // 它提供了通用功能，包括通用入口按钮（config，start/stop, plot），通用状态显示，
@@ -183,30 +186,21 @@ void MainWindow::onPaint(WPARAM wParam, LPARAM lParam) {
     Rectangle(hdc, 320, 70, 590, 220); // “发送远程服务器”
     Rectangle(hdc, 320, 230, 590, 390); // “保存本地文件”
 
-    wchar_t lbDAQ[] = L"Acquisition Hardware";
-    TextOut(hdc, 20, 40, lbDAQ, (int)wcslen(lbDAQ));
-    wchar_t lbProc[] = L"Data Processing";
-    TextOut(hdc, 320, 40, lbProc, (int)wcslen(lbProc));
-    wchar_t lbStat[] = L"System Log";
-    TextOut(hdc, 620, 40, lbStat, (int)wcslen(lbStat));
+    // 主类别
+    setLabel(hdc, 20, 40, L"Acquistion Hardware");
+    setLabel(hdc, 320, 40, L"Data Processing");
 
     // 采集卡
-    wchar_t lbCardsConfig[] = L"Cards";
-    TextOut(hdc, 40, 80, lbCardsConfig, (int)wcslen(lbCardsConfig));
-    wchar_t lbCardsStatus[] = L"Status";
-    TextOut(hdc, 170, 80, lbCardsStatus, (int)wcslen(lbCardsStatus));
+    setLabel(hdc, 40, 80, L"Cards");
+    setLabel(hdc, 170, 80, L"Status");
 
     // 远程服务器
-    wchar_t lbProcRemoteTitle[] = L"Send to Remote Server";
-    TextOut(hdc, 330, 80, lbProcRemoteTitle, (int)wcslen(lbProcRemoteTitle));
-    wchar_t lbProcRemoteIp[] = L"IP Address";
-    TextOut(hdc, 330, 110, lbProcRemoteIp, (int)wcslen(lbProcRemoteIp));
-    wchar_t lbProcRemotePort[] = L"Port";
-    TextOut(hdc, 330, 140, lbProcRemotePort, (int)wcslen(lbProcRemotePort));
+    setLabel(hdc, 330, 80, L"Send to Remote Server");
+    setLabel(hdc, 330, 110, L"IP Address");
+    setLabel(hdc, 330, 140, L"Port");
 
     // 本地数据保存
-    wchar_t lbProcLocalTitle[] = L"Save to Local Directory";
-    TextOut(hdc, 330, 240, lbProcLocalTitle, (int)wcslen(lbProcLocalTitle));
+    setLabel(hdc, 330, 240, L"Save to Local Directory");
 
     // 设置状态
     //Rectangle(hdc, 330, 170, 420, 230);
