@@ -173,6 +173,7 @@
     <ClInclude Include="LogStream.h" />
     <ClInclude Include="LogSystem.h" />
     <ClInclude Include="MainWindow.h" />
+    <ClInclude Include="ModalDialog.h" />
     <ClInclude Include="RingBuffer.h" />
     <ClInclude Include="SimpleConfig.h" />
     <ClInclude Include="StatusBox.h" />

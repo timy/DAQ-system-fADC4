@@ -60,5 +60,3 @@ private:
     template <typename T> void RetrieveIntFromEdit(HWND hWnd, T& value); // T for int or unsigned int
     template <typename T> void UpdateEditFromInt(HWND hWnd, T value); // T for int or unsigned int
 };
-
-bool DisplayModalDialog(HWND hParent, CardParamsAdc4* card);

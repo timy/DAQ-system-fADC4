@@ -132,6 +132,9 @@
     <ClInclude Include="Device\ADC4\SimulatedDataSourceAdc4.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ModalDialog.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DaqSystem.cpp">

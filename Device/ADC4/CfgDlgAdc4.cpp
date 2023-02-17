@@ -319,32 +319,3 @@ void CfgDlgAdc4::UpdateEditFromInt(HWND hWnd, T value) {
 	swprintf_s(strVal, L"%d", value);
 	SetWindowText(hWnd, strVal);
 }
-
-
-#include <iostream>
-bool DisplayModalDialog(HWND hParent, CardParamsAdc4* card) {
-
-	EnableWindow(hParent, FALSE);
-
-	CfgDlgAdc4 dlg(card);
-	wchar_t title[32];
-	wsprintf(title, L"ADC Card %d Configuration", card->id);
-	if (!dlg.Create(title, WS_CAPTION | WS_VISIBLE, 0,
-		CW_USEDEFAULT, CW_USEDEFAULT, 550, 470, hParent)) {
-		std::cout << "[ERR] Fail to create card configuratoin panel." << std::endl;
-		return false;
-	}
-	dlg.Show();
-
-	// Run the message loop.
-	MSG msg = { };
-	while (GetMessage(&msg, NULL, 0, 0)) {
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
-
-	EnableWindow(hParent, TRUE);
-	SetForegroundWindow(hParent);
-
-	return dlg.isApply();
-}
