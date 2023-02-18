@@ -159,6 +159,7 @@
     <ClInclude Include="CardParamsBase.h" />
     <ClInclude Include="DeviceParamsBase.h" />
     <ClInclude Include="Device\ADC4\CfgDlgAdc4.h" />
+    <ClInclude Include="Device\ADC4\CfgDlgAdc4Global.h" />
     <ClInclude Include="Device\ADC4\ChannelDetailsAdc4.h" />
     <ClInclude Include="Device\ADC4\DataAdc4.h" />
     <ClInclude Include="Device\ADC4\DeviceAdc4.h" />
@@ -188,6 +189,7 @@
     <ClCompile Include="DataVisualizerWindow.cpp" />
     <ClCompile Include="DeviceParamsBase.cpp" />
     <ClCompile Include="Device\ADC4\CfgDlgAdc4.cpp" />
+    <ClCompile Include="Device\ADC4\CfgDlgAdc4Global.cpp" />
     <ClCompile Include="Device\ADC4\ChannelDetailsAdc4.cpp" />
     <ClCompile Include="Device\ADC4\DeviceAdc4.cpp" />
     <ClCompile Include="Device\ADC4\DeviceParamsAdc4.cpp" />

@@ -90,7 +90,8 @@ protected:
     void cmd_edtProcPort(WID id, int evt, LPARAM lParam);
     void cmd_btnProcConnect(WID id, int evt, LPARAM lParam);
     
-    void cmd_btnDaqCfg(WID id, int evt, LPARAM lParam);
+    void cmd_btnDaqCfgGlobal(WID id, int evt, LPARAM lParam);
+    void cmd_btnDaqCfgCards(WID id, int evt, LPARAM lParam);
     void cmd_btnDaqPlot(WID id, int evt, LPARAM lParam);
 
 
@@ -108,7 +109,8 @@ protected:
     Widget<MainWindow, edt_t> edtProcPort;
     Widget<MainWindow, btn_t> btnProcConnect;
 
-    std::vector<Widget<MainWindow, btn_t>*> btnDaqCfg;
+    Widget<MainWindow, btn_t> btnDaqCfgGlobal;
+    std::vector<Widget<MainWindow, btn_t>*> btnDaqCfgCards;
 
     StatusBox* statusBoxDevices;
     StatusBox* statusBoxNetwork;

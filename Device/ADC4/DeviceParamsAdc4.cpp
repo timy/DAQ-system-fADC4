@@ -138,15 +138,27 @@ void DeviceParamsAdc4::exportToFile(std::ofstream& file) {
 }
 
 #include "../../ModalDialog.h"  // DisplayModalDialog
+#include "CfgDlgAdc4Global.h"   // CfgDlgAdc4Global
 #include "CfgDlgAdc4.h"         // CfgDlgAdc4
-bool DeviceParamsAdc4::applyCardConfiguration(unsigned int i, HWND hwnd) {
+
+// configure global parameters
+bool DeviceParamsAdc4::configure(HWND hwnd) {
+
+    bool isApplied = ShowModalDialog<DeviceParamsAdc4, CfgDlgAdc4Global>(
+        hwnd, this, L"Configuration of ADC Global Parameters", 550, 470);
+
+    return false;
+}
+
+// configure parameters of card i
+bool DeviceParamsAdc4::configure(unsigned int i, HWND hwnd) {
 
     // create a temp struct to hold params of card[i], which will be shown in the device config pannel
     CardParamsAdc4 newCard = *static_cast<CardParamsAdc4*>(cards[i]);
 
     // show the config pannel for user to start parameters configuration
     wchar_t title[32];
-    swprintf(title, sizeof(title)/sizeof(*title), L"Configuration of ADC Card %u", i);
+    swprintf(title, sizeof(title) / sizeof(*title), L"Configuration of ADC Card %u", i);
     bool isApplied = ShowModalDialog<CardParamsAdc4, CfgDlgAdc4>(
         hwnd, &newCard, title, 550, 470);
     if (isApplied) { // if the "Apply" button is clicked

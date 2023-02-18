@@ -109,7 +109,8 @@ public:
 
     virtual void importFromFile(std::ifstream& file);
     virtual void exportToFile(std::ofstream& file);
-    virtual bool applyCardConfiguration(unsigned int i, HWND hwnd);
+    virtual bool configure(HWND hwnd) override;
+    virtual bool configure(unsigned int i, HWND hwnd) override;
 
     unsigned int trigger_card;
     unsigned int trigger_channel;

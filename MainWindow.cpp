@@ -90,8 +90,8 @@ void MainWindow::initializeStatusBox() {
     statusBoxDevices = new StatusBox[nCards];
     for (unsigned int i = 0; i < nCards; i++) {
         statusBoxDevices[i].create(
-            btnDaqCfg[i]->x + 40,
-            btnDaqCfg[i]->y - btnDaqCfg[i]->h / 2,
+            btnDaqCfgCards[i]->x + 40,
+            btnDaqCfgCards[i]->y - btnDaqCfgCards[i]->h / 2,
             180, 20);
         //statusBoxDevices[i].setStatus(L"enabled", DAQ_STATUS_READY);
         //statusBoxDevices[i].repaint(m_hwnd);
@@ -158,12 +158,15 @@ void MainWindow::onCreate(WPARAM wParamm, LPARAM lParam) {
     initializeDaqSystem();
 
     // DAQ 子卡配置按钮
+    if (nCards > 0) {
+        btnDaqCfgGlobal.Create(this, 60, 90, &MainWindow::cmd_btnDaqCfgGlobal, L"Cards", 60);
+    }
     for (unsigned int i = 0; i < nCards; i++) {
         wchar_t label[64];
         wsprintf(label, L"Card %u", i);
-        unsigned int y = 120 + i * 30;
-        btnDaqCfg.push_back(new Widget<MainWindow, btn_t>);
-        btnDaqCfg.back()->Create(this, 60, y, &MainWindow::cmd_btnDaqCfg, label, 60);
+        unsigned int y = 130 + i * 30;
+        btnDaqCfgCards.push_back(new Widget<MainWindow, btn_t>);
+        btnDaqCfgCards.back()->Create(this, 60, y, &MainWindow::cmd_btnDaqCfgCards, label, 60);
     }
 
     initializeStatusBox();
@@ -176,11 +179,14 @@ void MainWindow::onPaint(WPARAM wParam, LPARAM lParam) {
     hdc = BeginPaint(m_hwnd, &pc);
 
     // panel 主类别
-    Rectangle(hdc, 10, 30, 300, 600);
-    Rectangle(hdc, 310, 30, 600, 600);
+    Rectangle(hdc, 10, 30, 300, 600);  // 数据采集
+    Rectangle(hdc, 310, 30, 600, 600); // 数据处理
 
-    // panel 数据采集
+    // panel 数据采集 - 配置总框
     Rectangle(hdc, 20, 70, 290, 540);
+    // panel 数据采集 - 子卡
+    Rectangle(hdc, 25, btnDaqCfgCards[0]->y - btnDaqCfgCards[0]->h / 2 - 10,
+        285, btnDaqCfgCards.back()->y + btnDaqCfgCards.back()->h / 2 + 10);
 
     // panel 数据处理
     Rectangle(hdc, 320, 70, 590, 220); // “发送远程服务器”
@@ -191,7 +197,7 @@ void MainWindow::onPaint(WPARAM wParam, LPARAM lParam) {
     setLabel(hdc, 320, 40, L"Data Processing");
 
     // label 采集卡
-    setLabel(hdc, 40, 80, L"Cards");
+    //setLabel(hdc, 40, 80, L"Cards");
     setLabel(hdc, 170, 80, L"Status");
 
     // label 远程服务器
@@ -245,9 +251,9 @@ void MainWindow::onDestroy(WPARAM wParam, LPARAM lParam) {
     finalizeVisualizer();
     finalizeStatusBox();
 
-    while (!btnDaqCfg.empty()) {
-        delete btnDaqCfg.back();
-        btnDaqCfg.pop_back();
+    while (!btnDaqCfgCards.empty()) {
+        delete btnDaqCfgCards.back();
+        btnDaqCfgCards.pop_back();
     }
 
     finalizeDaqSystem();
@@ -264,7 +270,7 @@ void MainWindow::cmd_btnDaqStart(WID id, int evt, LPARAM lParam) {
     // toggle the text of the "start/stop" button, and disable all config buttons
     bool isRunning = daq->isRunning();
     SetWindowText((HWND)lParam, isRunning ? L"Stop" : L"Start");
-    for (auto btn : btnDaqCfg)
+    for (auto btn : btnDaqCfgCards)
         btn->Enable(!isRunning);
     btnDaqImport.Enable(!isRunning);
     btnDaqPlot.Enable(isRunning);
@@ -308,9 +314,15 @@ void MainWindow::cmd_btnDaqExport(WID id, int evt, LPARAM lParams) {
     }
 }
 
-void MainWindow::cmd_btnDaqCfg(WID id, int evt, LPARAM lParam) {
-    unsigned int i = (unsigned int)(id - btnDaqCfg[0]->id); // card id
-    if (deviceParams->applyCardConfiguration(i, m_hwnd)) {
+void MainWindow::cmd_btnDaqCfgGlobal(WID id, int evt, LPARAM lParam) {
+    if (deviceParams->configure(m_hwnd)) {
+        daq->setConfigRequired();
+    }
+}
+
+void MainWindow::cmd_btnDaqCfgCards(WID id, int evt, LPARAM lParam) {
+    unsigned int i = (unsigned int)(id - btnDaqCfgCards[0]->id); // card id
+    if (deviceParams->configure(i, m_hwnd)) {
         // once parameters are set, notify the Daq that configuration is required
         daq->setConfigRequired(); // NOTE!!!! 检查何时需要将 isRequired 设为 false
         const wchar_t* str[2] = { L"disabled", L"enabled" };
