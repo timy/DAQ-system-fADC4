@@ -65,7 +65,47 @@ public:
 protected:
 
     virtual PCWSTR  ClassName() const = 0;
-    virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
+    virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+        switch (uMsg) {
+        case WM_PAINT:
+            onPaint(wParam, lParam);
+            return 0;
+        case WM_SIZE:
+            onSize(wParam, lParam);
+            return 0;
+        case WM_VSCROLL:
+            onVScroll(wParam, lParam);
+            return 0;
+        case WM_COMMAND:
+            onCommand(wParam, lParam);
+            return 0;
+        case WM_CREATE:
+            onCreate(wParam, lParam);
+            return 0;
+        case WM_DESTROY:
+            onDestroy(wParam, lParam);
+            PostQuitMessage(0);
+            return 0;
+        case WM_CLOSE:
+            return onClose(wParam, lParam);
+        }
+        return DefWindowProc(m_hwnd, uMsg, wParam, lParam);
+    }
+    virtual void onPaint(WPARAM wParam, LPARAM lParam) {}
+    virtual void onSize(WPARAM wParam, LPARAM lParam) {}
+    virtual void onVScroll(WPARAM wParam, LPARAM lParam) {}
+    virtual void onCommand(WPARAM wParam, LPARAM lParam) {
+        WID id = LOWORD(wParam);
+        int evt = HIWORD(wParam);
+        this->cmdProcess(id, evt, lParam);
+    }
+    virtual void onCreate(WPARAM wParamm, LPARAM lParam) {}
+    virtual void onDestroy(WPARAM wParam, LPARAM lParam) {}
+    virtual LRESULT onClose(WPARAM wParam, LPARAM lParam) {
+        DestroyWindow(m_hwnd);
+        return 0;
+    }
+
 
     HWND m_hwnd;
 };

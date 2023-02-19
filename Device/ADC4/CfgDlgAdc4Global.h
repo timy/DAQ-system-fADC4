@@ -9,15 +9,13 @@ public:
     CfgDlgAdc4Global(DeviceParamsAdc4* dev_) : device(dev_), bApply(false) {}
 
     PCWSTR ClassName() const { return L"Modal Dialog Class"; }
-    LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lPaBram);
     BOOL Show(int nCmdShow = SW_SHOW);
     BOOL isApply() { return bApply; }
 
 protected:
-    virtual void onCreate(WPARAM wParamm, LPARAM lParam);
-    virtual void onCommand(WPARAM wParam, LPARAM lParam);
-    virtual LRESULT onClose(WPARAM wParam, LPARAM lParam);
-    virtual void onPaint(WPARAM wParam, LPARAM lParam);
+    virtual void onCreate(WPARAM wParamm, LPARAM lParam) override;
+    virtual LRESULT onClose(WPARAM wParam, LPARAM lParam) override;
+    virtual void onPaint(WPARAM wParam, LPARAM lParam) override;
 
     Widget<CfgDlgAdc4Global, btn_t> btnApply;
     Widget<CfgDlgAdc4Global, edt_t> edtRangeStart;

@@ -19,7 +19,6 @@ public:
     DataVisualizerWindow(DaqStatusBaseType* src_);
     ~DataVisualizerWindow();
     PCWSTR ClassName() const { return L"Modal Dialog Class"; }
-    LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
     BOOL Show(int nCmdShow = SW_SHOW);
     virtual BOOL Create(
         PCWSTR lpWindowName,
@@ -34,8 +33,8 @@ public:
 
 protected:
 
-    virtual LRESULT onClose(WPARAM wParam, LPARAM lParam);
-    virtual void onPaint(WPARAM wParam, LPARAM lParam);
+    virtual LRESULT onClose(WPARAM wParam, LPARAM lParam) override;
+    virtual void onPaint(WPARAM wParam, LPARAM lParam) override;
 
     void cmd_sttCanvas(WID id, int evt, LPARAM lParam);
     void cmd_ckbDisplayChannels(WID id, int evt, LPARAM lParam);
@@ -47,10 +46,9 @@ protected:
     Widget<DataVisualizerWindow, stt_t> sttCanvas;
     Widget<DataVisualizerWindow, btn_t> btnTest;
     
-    virtual void onCreate(WPARAM wParamm, LPARAM lParam);
-    virtual void onDestroy(WPARAM wParam, LPARAM lParam);
-    virtual void onCommand(WPARAM wParam, LPARAM lParam);
-    virtual void onSize(WPARAM wParam, LPARAM lParam);
+    virtual void onCreate(WPARAM wParamm, LPARAM lParam) override;
+    virtual void onDestroy(WPARAM wParam, LPARAM lParam) override;
+    virtual void onSize(WPARAM wParam, LPARAM lParam) override;
 
     ID2D1Factory* m_pD2dFactory;
     ID2D1HwndRenderTarget* m_pRenderTarget;

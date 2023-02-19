@@ -3,27 +3,6 @@
 #include <string> // to_wstring
 using std::to_wstring;
 
-LRESULT CfgDlgAdc4Global::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
-	switch (uMsg) {
-
-	case WM_PAINT:
-		onPaint(wParam, lParam);
-		return 0;
-	case WM_COMMAND:
-		onCommand(wParam, lParam);
-		return 0;
-	case WM_CREATE:
-		onCreate(wParam, lParam);
-		return 0;
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		return 0;
-	case WM_CLOSE:
-		return onClose(wParam, lParam);
-	}
-	return DefWindowProc(m_hwnd, uMsg, wParam, lParam);
-}
-
 BOOL CfgDlgAdc4Global::Show(int nCmdShow) {
 	return ShowWindow(m_hwnd, nCmdShow) && UpdateWindow(m_hwnd);
 }
@@ -36,12 +15,6 @@ void CfgDlgAdc4Global::onCreate(WPARAM wParamm, LPARAM lParam)
 
 	SetWindowText(edtRangeStart.hwnd, to_wstring(device->range_start).c_str());
 	SetWindowText(edtRangeEnd.hwnd, to_wstring(device->range_end).c_str());
-}
-
-void CfgDlgAdc4Global::onCommand(WPARAM wParam, LPARAM lParam) {
-	WID id = (WID)LOWORD(wParam);
-	int evt = HIWORD(wParam);
-	cmdProcess((WID)id, evt, lParam);
 }
 
 LRESULT CfgDlgAdc4Global::onClose(WPARAM wParam, LPARAM lParam) {

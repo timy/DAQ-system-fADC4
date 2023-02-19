@@ -229,11 +229,6 @@ void MainWindow::onSize(WPARAM wParam, LPARAM lParam) {
     logDisplay->onSize(clientH, clientW);
 }
 
-void MainWindow::onCommand(WPARAM wParam, LPARAM lParam) {
-    int id = LOWORD(wParam), evt = HIWORD(wParam);
-    cmdProcess((WID)id, evt, lParam); // NOTE!!! require check!
-}
-
 LRESULT MainWindow::onClose(WPARAM wParam, LPARAM lParam) {
     if (daq->isRunning()) {
         MessageBox(m_hwnd, L"Data acquisition is still running. Stop it before exit.", L"", MB_OK);

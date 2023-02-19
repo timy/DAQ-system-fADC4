@@ -92,27 +92,6 @@ void CfgDlgAdc4::cmd_edtOffset(WID id, int evt, LPARAM lParam) {
 	return;
 }
 
-LRESULT CfgDlgAdc4::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
-	switch (uMsg) {
-
-	case WM_PAINT:
-		onPaint(wParam, lParam);
-		return 0;
-	case WM_COMMAND:
-		onCommand(wParam, lParam);
-		return 0;
-	case WM_CREATE:
-		onCreate(wParam, lParam);
-		return 0;
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		return 0;
-	case WM_CLOSE:
-		return onClose(wParam, lParam);
-	}
-	return DefWindowProc(m_hwnd, uMsg, wParam, lParam);
-}
-
 BOOL CfgDlgAdc4::Show(int nCmdShow) {
 	return ShowWindow(m_hwnd, nCmdShow) && UpdateWindow(m_hwnd);
 }
@@ -213,26 +192,6 @@ void CfgDlgAdc4::onCreate(WPARAM wParamm, LPARAM lParam) {
 		SendMessage(chd[i].w["ckbEdgeMode"]->hwnd, BM_SETCHECK, card->channels[i].isEdgeMode, 0);
 		SendMessage(chd[i].w["ckbRising"]->hwnd, BM_SETCHECK, card->channels[i].isRising, 0);
 	}
-}
-
-void CfgDlgAdc4::onCommand(WPARAM wParam, LPARAM lParam) {
-
-	WID id = (WID)LOWORD(wParam);
-	int evt = HIWORD(wParam);
-	cmdProcess((WID)id, evt, lParam);
-
-	//switch (id) {
-	//case WG_BTN_TEST: { // 点击“测试”按钮
-	//	//int len = SendMessage(hEdtTest, WM_GETTEXTLENGTH, 0, 0);
-	//	//wchar_t* buffer = new wchar_t[len + 1];
-	//	//SendMessage(hEdtTest, WM_GETTEXT, (WPARAM)len + 1, (LPARAM)buffer);
-	//	//dev->id = _wtoi(buffer);
-	//	////SetWindowText(hSttTest, buffer);
-
-	//	//delete[] buffer;
-	//}
-	//break;
-	//}
 }
 
 void CfgDlgAdc4::UpdateCardEnabled() {
