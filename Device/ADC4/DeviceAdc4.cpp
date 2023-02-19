@@ -387,10 +387,12 @@ void DeviceAdc4::configTrigParams(DeviceParamsAdc4* params) {
 		}
 		
 		// NOTE!!!!! 配置 TDC 通道
-		cfg.tdc_enabled = true;
-		cfg.dc_offset[1] = -0.4;
-		cfg.trigger[NDIGO_TRIGGER_TDC].rising = false; // 下降沿
-		cfg.trigger[NDIGO_TRIGGER_TDC].edge = true;
+		if (params->trigger_card == i && params->trigger_channel == 4) {
+			cfg.tdc_enabled = true;
+			cfg.dc_offset[1] = -0.4; // NOTE!!!! will be change to "pc->channels[4].offset"
+			cfg.trigger[NDIGO_TRIGGER_TDC].rising = pc->channels[4].isRising; // false; // 下降沿
+			cfg.trigger[NDIGO_TRIGGER_TDC].edge = pc->channels[4].isEdgeMode; // true;
+		}
 		// if (i == 0) { // 同步总线的驱动源设为 0 号采集卡的 T 通道
 			// cfg.drive_bus[0] = NDIGO_TRIGGER_SOURCE_TDC; // TDC 为总线的同步驱动源，一般在多个通道同时记录背景信号时使用
 
