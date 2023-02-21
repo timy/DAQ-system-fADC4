@@ -265,6 +265,7 @@ void MainWindow::cmd_btnDaqStart(WID id, int evt, LPARAM lParam) {
     // toggle the text of the "start/stop" button, and disable all config buttons
     bool isRunning = daq->isRunning();
     SetWindowText((HWND)lParam, isRunning ? L"Stop" : L"Start");
+    btnDaqCfgGlobal.Enable(!isRunning);
     for (auto btn : btnDaqCfgCards)
         btn->Enable(!isRunning);
     btnDaqImport.Enable(!isRunning);
