@@ -86,7 +86,7 @@ CRONO_API int crono_sync_stop_capture(crono_sync* device) {
 
 #include <iostream> // NOTE!!!! remove me later!!!!
 CRONO_API int crono_sync_read(crono_sync* device, crono_sync_read_in* in, crono_sync_read_out* out) {
-	
+
 	// pre-allocat buffer to store out->group[0].packets
 	const int group_count{ 1 };
 	const int maxNumPackets{ 16 };
@@ -142,11 +142,14 @@ CRONO_API int crono_sync_read(crono_sync* device, crono_sync_read_in* in, crono_
 			}
 			sds->acknowledge();
 			out->group_count = group_count;
-			out->groups = croGroup; // fill the output struct with the buffer address 
-			out->error_code = 0;
-			out->error_message = "OK";
 		}
 	}
+	else {
+		out->group_count = 0;
+	}
+	out->groups = croGroup; // fill the output struct with the buffer address 
+	out->error_code = 0;
+	out->error_message = "OK";
 	return 0;
 }
 
