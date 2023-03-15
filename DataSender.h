@@ -78,7 +78,7 @@ public:
 		packet_adc_header_t header;
 
 		if (!isConnected) {
-			cout << "attemp to send, while isConnected = false"<< endl;
+			cout << "attempt to send, while isConnected = false"<< endl;
 			return -1;
 		}
 

@@ -6,98 +6,119 @@
 #include "SimulateAdc4.h"
 
 #include <fstream>
+#include <memory>
 
-struct SimulatedDataPacketBufferADC4 {
-	crono_packet packet;              // 24 bytes, including "data" of 8 bytes
-	unsigned __int64 data_seq[1023];  // 1023 * 8 bytes. Adjust the size as required, imitating the buffer on chip
+class DataGenerationFunction {
+public:
+	DataGenerationFunction() {}
+	virtual ~DataGenerationFunction() {}
+	virtual double operator () (double t) = 0;
+};
+
+class DataGenerationFunctionGaussian : public DataGenerationFunction {
+public:
+	DataGenerationFunctionGaussian(double sigma, double t0, double ampl) :
+		sigma{ sigma }, t0{ t0 }, ampl{ ampl }, DataGenerationFunction() {}
+	virtual ~DataGenerationFunctionGaussian() {}
+	double operator () (double t) override {
+		return ampl * exp(-(t - t0) * (t - t0) / (2 * sigma * sigma));
+	}
+private:
+	double sigma;
+	double t0;
+	double ampl;
+};
+
+class SimulatedDataModel {
+public:
+	SimulatedDataModel(unsigned char channel, unsigned char card,
+		unsigned int length, unsigned __int64 timestamp,
+		std::unique_ptr<DataGenerationFunction> func) :
+		channel{ channel }, card{ card }, length{ length }, timestamp{ timestamp },
+		func{ std::move(func) } {
+	};
+	virtual ~SimulatedDataModel() {}
+	ndigo_packet* fillPacketData(ndigo_packet* packet) {
+		// fill the header
+		packet->channel = channel;
+		packet->card = card;
+		packet->type = NDIGO_PACKET_TYPE_16_BIT_SIGNED;
+		packet->flags = 0;
+		packet->length = length;
+		packet->timestamp = timestamp;
+		// fill crono_packet.data
+		short* pData = reinterpret_cast<short*>(packet->data);
+		unsigned int count = 0;
+		while (count / 4 < length) {
+			double time = (double)count++;
+			*pData++ = static_cast<short>((*func)(time));
+		}
+		// return value: the starting address of the next packet
+		return ndigo_next_packet(packet);
+	}
+private:
+	unsigned char channel;
+	unsigned char card;
+	unsigned int length;
+	unsigned __int64 timestamp;
+	std::unique_ptr<DataGenerationFunction> func;
 };
 
 
 class SimulatedDataSource {
 public:
-	SimulatedDataSource() : ready(false) {
-		// allocate buffer
-		buffers = new SimulatedDataPacketBufferADC4* [nBuffers];
-		for (int iBuffer = 0; iBuffer < nBuffers; iBuffer++)
-			buffers[iBuffer] = new SimulatedDataPacketBufferADC4;
-		
-		// fill the buffer
-		for (int iBuffer = 0; iBuffer < nBuffers; iBuffer++) {
-			
-			crono_packet& packet = buffers[iBuffer]->packet; // = &buffers[iBuffer]
+	SimulatedDataSource() {
 
-			// generate data (a gaussian), fill crono_packet.data
-			const float sigma = 10;
-			nData = 1024;
-			short* pData = reinterpret_cast<short*>(packet.data);
-			int i = 0;
-			while (i / 4 < nData) {
-				*pData = static_cast<short>(10000 * exp(-(i - 200.) * (i - 200.) / (2. * sigma * sigma)));
-				pData++;
-				i++;
-			}
+		SimulatedDataModel models[nPackets]{
+			{0, 0, 92, 11111, std::make_unique<DataGenerationFunctionGaussian>(10., 100., 10000.)},
+			{0, 0, 46, 22222, std::make_unique<DataGenerationFunctionGaussian>(20., 150., 8000.)},
+			{0, 0, 72, 33333, std::make_unique<DataGenerationFunctionGaussian>(30., 200., 6000.)},
+			{0, 0, 84, 44444, std::make_unique<DataGenerationFunctionGaussian>(40., 250., 4000.)}
+		};
 
-			// fill crono_packet
-			packet.channel = 0;
-			packet.card = 0;
-			packet.type = 0;
-			packet.flags = 0;
-			packet.length = nData;
-			packet.timestamp = 12345;
-		}
+		// fill the buffer that stores data to be used as packets by other caller
+		ndigo_packet* packet = reinterpret_cast<ndigo_packet*>(buffer);
+		for (auto& model : models)
+			packet = model.fillPacketData(packet);
 
-		// crono_group - assuming we have only one group now, i.e., nGroups = 1
-		groups = new crono_group[nGroups];
-		for (int iGroup = 0; iGroup < nGroups; iGroup++) {
-			groups[iGroup].trigger_index = 0;
-			groups[iGroup].flags = 0;
-			groups[iGroup].timestamp = 12345;
-			groups[iGroup].packet_count = (int)nBuffers; // adjust to actual number
-			groups[iGroup].packets = reinterpret_cast<crono_packet**>(buffers);
-			// NOTE!!!! 当前实现可能仅对 packet_count=1 有效。因为外部对 buffers 的调用会以 crono_packet 为
-			// 尺寸，不包含 SimulatedDataPacketBufferADC4 中 data_seq 的部分。这样在调用 group->packets[i]
-			// 且 i > 0 时，索引的地址必然会指向 group->packets[0] 中 data_seq 的某个地址，出现错误
-			// 还需继续考虑如何设计
-		}
-		
 		timer = new Timer;
 		timer->start(msUpdate, std::bind(&SimulatedDataSource::updateByTimer, this));
 	}
 	virtual ~SimulatedDataSource() {
 		timer->stop();
 		delete timer;
-		delete[] groups;
-		for (int iBuffer = 0; iBuffer < nBuffers; iBuffer++)
-			delete buffers[iBuffer];
-		delete[] buffers;
 	}
-	void generate(crono_sync_read_out* out) { // consumer
-		// simulate the data acquisition of the device, once ready, fill `out`
-		if (ready) {
-			std::unique_lock<std::mutex> lock(_mutex);
-			// crono_sync_read_out
-			out->group_count = 1;
-			out->groups = groups; // has been prepared in constructor
-			out->error_code = 0;
-			out->error_message = "OK";
-			ready = false;
-		}
+
+	bool update(ndigo_packet** firstPacket, ndigo_packet** lastPacket) {
+		ndigo_packet* packet = reinterpret_cast<ndigo_packet*>(buffer);
+		// "buffer" should have already been filled by parameters and pre-evaluatd data
+		*firstPacket = packet;
+		for (size_t i = 1; i < nPackets; i++)
+			packet = ndigo_next_packet(packet);
+		*lastPacket = packet;
+		return true;
+	}
+
+	inline bool isReady() const { return ready; }
+
+	inline void acknowledge() {
+		std::unique_lock<std::mutex> lock(_mutex);
+		ready = false;
 	}
 
 private:
 	Timer* timer;
 	const int msUpdate{ 1000 };     // time interval to update data in millisecond
-	const size_t nBuffers{ 1 };		// pre-allocated
-	const size_t nGroups{ 1 };		// pre-allocated
-	int nData;
-	SimulatedDataPacketBufferADC4** buffers;
-	crono_group* groups;
-	bool ready; // if data is ready to deliever
+
+	const static size_t nPackets{ 4 };
+
+	unsigned __int64 buffer[4096];
+
+	bool ready{ false }; // if data is ready to deliver
 	std::mutex _mutex;
 	void updateByTimer() { // producer, working on the thread initiated by the timer
 		{
 			std::unique_lock<std::mutex> lock(_mutex);
-			// produce data
 			ready = true;
 		}
 	}

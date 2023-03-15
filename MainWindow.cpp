@@ -359,9 +359,6 @@ void MainWindow::cmd_btnProcConnect(WID id, int evt, LPARAM lParam) {
     ev_port.get(port);
 
     daq->toggleStartRemoteConnection(ip, port);
-
-    //std::thread thrDataSend(&DataSender::start, ds);
-    //ThreadWrapper wrapThrDataSend(thrDataSend);
 }
 
 
