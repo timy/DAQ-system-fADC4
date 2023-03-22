@@ -148,7 +148,7 @@ void MainWindow::onCreate(WPARAM wParamm, LPARAM lParam) {
     // 远程数据传输 - 按钮 - 连接/断开服务器
     btnProcConnect.Create(this, 520, 190, &MainWindow::cmd_btnProcConnect, L"Connect");
 
-    SetWindowText(edtProcIp.hwnd, L"10.11.1.18");
+    SetWindowText(edtProcIp.hwnd, L"192.168.0.110");
     SetWindowText(edtProcPort.hwnd, L"8080");
 
     // 创建日志显示区
@@ -260,6 +260,7 @@ void MainWindow::cmd_btnLogClear(WID id, int evt, LPARAM lParam) {
 
 void MainWindow::cmd_btnDaqStart(WID id, int evt, LPARAM lParam) {
 
+    btnDaqStart.Enable(false); // prevent extra click
     daq->toggleStartDataAcquisition(deviceParams);
 
     // toggle the text of the "start/stop" button, and disable all config buttons
@@ -283,6 +284,7 @@ void MainWindow::cmd_btnDaqStart(WID id, int evt, LPARAM lParam) {
             }
         }
     }
+    btnDaqStart.Enable(true);
 }
 
 void MainWindow::cmd_btnDaqImport(WID id, int evt, LPARAM lParams) {
@@ -350,6 +352,7 @@ void MainWindow::cmd_edtProcPort(WID id, int evt, LPARAM lParam) {}
 
 void MainWindow::cmd_btnProcConnect(WID id, int evt, LPARAM lParam) {
 
+    btnProcConnect.Enable(false); // prevent extra click
     EditValue ev_ip(edtProcIp.hwnd, L"IP address should be provided!");
     std::string ip;
     ev_ip.get(ip);
@@ -358,7 +361,9 @@ void MainWindow::cmd_btnProcConnect(WID id, int evt, LPARAM lParam) {
     unsigned short port;
     ev_port.get(port);
 
-    daq->toggleStartRemoteConnection(ip, port);
+    bool isConnected = daq->toggleStartRemoteConnection(ip, port);   
+    SetWindowText((HWND)lParam, isConnected ? L"Disconnect" : L"Connect");
+    btnProcConnect.Enable(true);
 }
 
 

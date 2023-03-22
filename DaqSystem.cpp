@@ -109,13 +109,15 @@ void DaqSystem::stopDataSender() {
 	sig->bConnect = false;
 }
 
-void DaqSystem::toggleStartRemoteConnection(std::string ip, int port)
+bool DaqSystem::toggleStartRemoteConnection(std::string ip, int port)
 {
-	if (!ds->connected()) {
+	if (!ds->connected()) { // not yet started
 		startDataSender(ip, port);
+		return true; // connected
 	}
-	else {
+	else { // already started
 		stopDataSender();
+		return false; // not connected
 	}
 }
 

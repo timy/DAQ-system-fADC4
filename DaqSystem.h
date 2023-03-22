@@ -23,7 +23,7 @@ public:
 	unsigned int getNumberOfDevices();
 	DaqStatusBaseType* getDeviceStatus();
 
-	void toggleStartRemoteConnection(std::string ip, int port);
+	bool toggleStartRemoteConnection(std::string ip, int port);
 
 private:
 

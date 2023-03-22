@@ -169,7 +169,7 @@ void DeviceAdc4::capture(bool* bRun) {
 				fprintf(file_info, "%02x %02x %02x %6d %lld\n",
 					packet->card, packet->channel, packet->flags, 
 					packet->length, packet->timestamp);
-				//this->dataProcessor->writeHeader(packet); // NOTE!!! switch from file export to dataProcessor
+				this->dataProcessor->writeHeader(packet); // NOTE!!! switch from file export to dataProcessor
 				length = packet->length;
 			}
 
@@ -183,7 +183,7 @@ void DeviceAdc4::capture(bool* bRun) {
 				fprintf(file_data, "\n");
 
 				// !!!!!!!!!!!!!!!!!!!!!!!!!!
-				//this->dataProcessor->writeData(packet); // NOTE!!! switch from file export to dataProcessor
+				this->dataProcessor->writeData(packet); // NOTE!!! switch from file export to dataProcessor
 
 				st->countDataTotal += length;
 				st->countData[packet->card] += length;
